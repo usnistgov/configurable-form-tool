@@ -1,5 +1,7 @@
 # Configurable Form Tool
 
+The purpose of this repository is to enable community development of a web application supporting configurable forms. This tool is designed to be used with [Cordra](https://www.cordra.org/).
+
 ## Contribution
 
 [Contributions](https://github.com/usnistgov/configurable-form-tool/blob/main/CONTRIBUTING.md) of ideas, code, bug fixes, and examples are welcomed.
