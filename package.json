@@ -1,0 +1,20 @@
+{
+  "name": "configurable-form-tool",
+  "version": "1.0.0",
+  "main": "./deps/login.html",
+  "user": "jsonform",
+  "repository": "https://github.com/ztrautt/configurable-form-tool",
+  "description": "The purpose of this repository is to enable community development of a web application supporting configurable forms. This tool is designed to be used with Cordra.",
+  "keywords": [
+    "JSON",
+    "schema",
+    "HTML5",
+    "form"
+  ],
+  "maintainers": [],
+  "license": "MIT",
+  "dependencies": {
+    "@cnri/cordra-client": "^2.2.0",
+    "bootstrap-icons": "^1.4.0"
+  }
+}
