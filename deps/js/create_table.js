@@ -28,7 +28,6 @@ if (typeof GetURLParameter('formname') !== "undefined"
     var wrapperTable = document.getElementById("contentTab");
     var page_name="";
     var urlValue = decodeURIComponent(GetURLParameter('formname')).split("/");
-    //getData("/objects/?query=type:"+urlValue[2]+" AND /formAlternateName: " + urlValue[1])
     getData("/objects/?query=type:"+urlValue[2]+" AND /formAlternateName:" + urlValue[1])
         .then(response => response.json())
         .then(data => {
