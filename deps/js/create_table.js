@@ -28,7 +28,8 @@ if (typeof GetURLParameter('formname') !== "undefined"
     var wrapperTable = document.getElementById("contentTab");
     var page_name="";
     var urlValue = decodeURIComponent(GetURLParameter('formname')).split("/");
-    getData("/objects/?query=type:"+urlValue[2]+" AND /formAlternateName: " + urlValue[1])
+    //getData("/objects/?query=type:"+urlValue[2]+" AND /formAlternateName: " + urlValue[1])
+    getData("/objects/?query=type:"+urlValue[2]+" AND /formAlternateName:" + urlValue[1])
         .then(response => response.json())
         .then(data => {
             page_name="<h1 class='page-header'>"+urlValue[0].charAt(0).toUpperCase()+ urlValue[0].slice(1);
@@ -38,24 +39,19 @@ if (typeof GetURLParameter('formname') !== "undefined"
                 + " <div style='overflow-x:auto;'><table class='table table-striped'>"
                 + "<thead>"
                 + "<tr>"
-                + "<th scope='col'>#</th>"
+                + "<th scope='col'>Persistent Identifier</th>"
                 + "<th scope='col'>Name</th>"
-                + "<th scope='col'>Nist property</th>"
-                + "<th scope='col'>Model number</th>"
                 + "<th></th>"
                 + " </tr>"
                 + " </thead>"
                 + "<tbody>";
             var tableElmt = "";
             data.results.forEach(element => {
-                if (!!element.content && element.metadata.createdBy == "admin") {
-                    tableHTML += "<tr>"
-                        + "<th scope='row'>1</th>";
+                if (!!element.content) {
+                    tableElmt = element.content['@id'];
+                    tableHTML += "<tr>" 
+                    tableHTML += "<th scope='row'>" + element.content['@id'] + "</th>";
                     tableHTML += (!!element.content['name']) ? "<td>" + element.content['name'] + "</td>" : "<td></td>";
-
-                    tableHTML += (!!element.content['nist_property']) ? "<td>" + element.content['nist_property'] + "</td>" : "<td></td>";
-
-                    tableHTML += (!!element.content['model_number']) ? "<td>" + element.content['model_number'] + "</td>" : "<td></td>";
                     tableHTML += "<td>";
                     tableHTML += (!!element['id']) ? "<button type='button' class='btn btn-primary' onclick=OpenBtnPage('edit_" + element.content['@id'] +"_"+ element['type'] +"')>"
                         + "<span class='glyphicon glyphicon-pencil'></span></button>" : " ";
@@ -68,6 +64,9 @@ if (typeof GetURLParameter('formname') !== "undefined"
                 }
             });
             tableHTML += "</tbody></table></div></div>";
-            wrapperTable.innerHTML = tableHTML;
+            if(!!tableElmt)
+                wrapperTable.innerHTML = tableHTML;
+            else
+            wrapperTable.innerHTML = "";
         });
 }
