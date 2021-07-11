@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="./deps/img/form-tool-logo-transparent.png">
+    <link rel="canonical" href="">
+
+    <title>Dashboard Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="./deps/opt/bootstrap.css">
+    <link rel="stylesheet" href="./deps/css/style.css">
+    
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap.min.css">
+
+    <!-- Our project just needs Font Awesome solid + brand -->
+    <script defer src="./node_modules/@fortawesome/fontawesome-free/js/brands.js"></script>
+    <script defer src="./node_modules/@fortawesome/fontawesome-free/js/solid.js"></script>
+    <script defer src="./node_modules/@fortawesome/fontawesome-free/js/fontawesome.js"></script>
+
+
+
+    <script type="text/javascript" src="./deps/js/clientutils.js"></script>
+    <script type="text/javascript" src="./deps/js/login_required.js"></script>
+    <script type="text/javascript" src="./deps/js/login.js"></script>
+
+    <script type="text/javascript" src="./deps/jquery.min.js"></script>
+    <script type="text/javascript" src="./deps/underscore.js"></script>
+    <script type="text/javascript" src="./deps/opt/jsv.js"></script>
+    <script type="text/javascript" src="./lib/jsonform.js"></script>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="index.html">
+                    <img src="./deps/img/logo_form.png" height="46" alt="">
+                </a>
+
+
+
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <img src="./deps/img/img_avatar.png" alt="Avatar" class="avatar">
+                    </li>
+                    <li> <a id="username"></a></li>
+                    <li> <a href="#" onClick="logoutUser()">Logout</a></li>
+
+
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            
+            <div class="col-sm-3 col-md-2 sidebar">
+
+                <ul class="nav nav-sidebar" id="tab">
+                </ul>
+            </div>
+            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                
+                <div id="page-header"></div>
+                <!--<input type='text' class='form-control form-control-lg' id='search'>-->
+                <div class="alert alert-success alert-dismissible fade in" role="alert" id="msg" style="display: none;"> 
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button> 
+                    <strong id="message"></strong>  
+                </div>
+                <div id="contentTab">
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+</body>
+<script src="https://getbootstrap.com/docs/3.4/dist/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
+<script src="./deps/js/prettyprint.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
+
+<!--Script to create a sidebar  -->
+<script src="./deps/js/sidebar.js"></script>
+<!--Script to create tables that will display content -->
+<script src="./deps/js/create_table.js"></script>
+<!--Script to upload file  -->
+<script src="./deps/js/upload_file.js"></script>
+<!--Script to create Form -->
+<script src="./deps/js/createForm.js"></script>
+<!--Script to edit and view data element from the  Form -->
+<script src="./deps/js/edit_view.js"></script>
+<script>
+    if(!!localStorage.getItem("message")&& localStorage.getItem("message")!=""){
+        
+        document.getElementById( 'msg' ).style.display = 'block';
+        document.getElementById("message").innerHTML =localStorage.getItem("message");
+        localStorage.setItem("message", "");
+        setInterval(function() {
+            document.getElementById( 'msg' ).style.display = 'none';
+            }, 3*1000);
+    }
+    if(!!sessionStorage.getItem("username")){
+        document.getElementById( 'username' ).innerHTML = sessionStorage.getItem("username");
+    }
+    
+</script>
+</html>

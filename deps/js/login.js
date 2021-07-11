@@ -30,7 +30,6 @@ async function loginUser(username, password) {
 
 	// try to get access token
 	let access_token = resp["access_token"];
-
 	// does it exist?
 	if (access_token == undefined) {
 		console.log('auth failed');
@@ -39,13 +38,20 @@ async function loginUser(username, password) {
 	}
 
 	// check token
-	const intro_ret = postData('/auth/introspect', { 'token': access_token });
-
+	const intro_ret = postData('/auth/introspect', { token: access_token })
+		.then(response=>
+			response.json().then(values => {
+				if(!!values.userId){
+					saveAuthToken(username, access_token,values.userId);
+					window.location.replace("./../index.html");
+				}
+					
+			  }));
+	
 	// write back access token to global store
-	saveAuthToken(username, access_token);
-
+	
 	// refresh page now that we're logged in
-	window.location.replace("home.html");
+	
 
 	return true;
 }
@@ -65,6 +71,8 @@ async function logoutUser() {
 
 	sessionStorage.removeItem("username");
 	sessionStorage.removeItem("authToken");
+	sessionStorage.removeItem("userId");
+
 	// force reload since we logged out
 	location.reload();
 

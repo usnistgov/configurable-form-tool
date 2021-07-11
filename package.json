@@ -15,6 +15,8 @@
   "license": "MIT",
   "dependencies": {
     "@cnri/cordra-client": "^2.2.0",
-    "bootstrap-icons": "^1.4.0"
+    "@fortawesome/fontawesome-free": "^5.15.3",
+    "bootstrap-icons": "^1.4.0",
+    "datatables.net": "^1.10.24"
   }
 }
