@@ -91,10 +91,10 @@ if (typeof GetURLParameter('formname') !== "undefined" && GetURLParameter('formn
                         + "<div class='form-group' id='select_drop'>"
                         + "</div>"
                         + "<div class='checkbox'> <label>"
-                        + "<input type='checkbox' id='read' name='read' value='read' required>Can Read"
+                        + "<input type='checkbox' id='read' class='form-check-input' name='read' value='read' required>Can Read"
                         + "</label></div>"
                         + "<div class='checkbox'> <label>"
-                        + "<input type='checkbox' id='write'  name='write' value='write' required>Can write"
+                        + "<input type='checkbox' id='write' class='form-check-input'  name='write' value='write' required>Can write"
                         + "</label></div>"
                         + "<button  type='submit' id='submit_btn' class='btn btn-default'>Add</button>"
                         + "</form>"
@@ -124,12 +124,13 @@ if (typeof GetURLParameter('formname') !== "undefined" && GetURLParameter('formn
                 location.reload();
             });
             $('#shareModal').on('show.bs.modal', function (event) {
-
+                
                 var button = $(event.relatedTarget); // Button that triggered the modal
                 var recipient = button.data('id'); // Extract info from data-* attributes   
 
                 $('#submit_btn').click(function (e) {
                     e.preventDefault();
+                    
                     var data = {
                         readers: [],
                         writers: []
@@ -141,26 +142,38 @@ if (typeof GetURLParameter('formname') !== "undefined" && GetURLParameter('formn
                     if ($('#write').is(":checked")) {
                         data.writers = $('#drop').val();
                     }
-
-                    getData("/acls/" + recipient).then(response => response.json())
-                        .then(acl_datas => {
-                            if (!!acl_datas && typeof acl_datas.readers !== "undefined" && acl_datas.readers !== null
-                                && typeof acl_datas.writers !== "undefined" && acl_datas.writers !== null) {
-                                data.readers = data.readers.concat(acl_datas.readers);
-                                data.writers = data.writers.concat(acl_datas.writers);
-                                
-                            }
-                            putData('/acls/' + recipient, data).then(respons => {
-                                if (respons.status == 200) {
-                                    $('#acl_user')[0].reset();
-                                    data = {};
-                                    $('#drop').multiselect('refresh');
-                                    loadTable(recipient);
-                                    dropdown(recipient);
+                    console.log(data.writers);
+                    console.log(data.readers);
+                    console.log(data);
+                    if(data.writers === null && data.readers ===null){
+                        alert("You must select a user");
+                    }else{
+                        if(data.writers.length === 0 && data.readers.length ===0){
+                            alert("You must check at least one box");
+                        }else{
+                            getData("/acls/" + recipient).then(response => response.json())
+                            .then(acl_datas => {
+                                if (!!acl_datas && typeof acl_datas.readers !== "undefined" && acl_datas.readers !== null
+                                    && typeof acl_datas.writers !== "undefined" && acl_datas.writers !== null) {
+                                    data.readers = data.readers.concat(acl_datas.readers);
+                                    data.writers = data.writers.concat(acl_datas.writers);
+                                    
                                 }
+                                putData('/acls/' + recipient, data).then(respons => {
+                                    if (respons.status == 200) {
+                                        $('#acl_user')[0].reset();
+                                        data = {};
+                                        $('#drop').multiselect('refresh');
+                                        loadTable(recipient);
+                                        dropdown(recipient);
+                                    }
+                                });
+    
                             });
-
-                        });
+                        }
+                        
+                    }
+                    
                 });
                 loadTable(recipient);
                 dropdown(recipient);
@@ -190,14 +203,14 @@ function loadTable(recipient) {
                
                 acl_datas.readers.forEach(elt => {
                     if (!!elt && elt.length > 0)
-                        setUsers.set(elt, { readers: true });
+                        setUsers.set(elt, { readers: true, writers: false });
                 });
                 acl_datas.writers.forEach(elt_2 => {
                     if (!!elt_2 && elt_2.length > 0)
                         if (!!setUsers.get(elt_2)) {
                             setUsers.set(elt_2, { ...setUsers.get(elt_2), writers: true });
                         } else {
-                            setUsers.set(elt_2, { writers: true });
+                            setUsers.set(elt_2, { writers: true, readers: false});
                         }
                 });
                 data.results.forEach(element => {
@@ -205,46 +218,90 @@ function loadTable(recipient) {
                         setUsers.set(element.content['@id'], { ...setUsers.get(element.content['@id']), name: element.content['name'] });
                     }
                 });
+                console.log(setUsers);
                 for (const [key, value] of setUsers.entries()) {
                     tableUsers += (!!value.name && typeof value.name !== "undefined") ? "<td>" + value.name + "</td>" : "<td> </td>";
-                    tableUsers += (!!value.readers && typeof value.readers !== "undefined") ? "<td>" + value.readers + "</td>" : "<td> false</td>";
-                    tableUsers += (!!value.writers && typeof value.writers !== "undefined") ? "<td>" + value.writers + "</td>" : "<td> false</td>";
+                    tableUsers += ( typeof value.readers !== "undefined") ?(( value.readers ==true) ?"<td><button class='btn btn-sm btn-primary active' onclick=switch_btn('readers_"+key+"_"+recipient+"_"+value.readers+"')>Yes</button></td>" : "<td><button class='btn btn-sm btn-default' onclick=switch_btn('readers_"+key+"_"+recipient+"_"+value.readers+"') >No</button></td>" ): "<td> </td>";
+                    tableUsers += ( typeof value.writers !== "undefined") ?(( value.writers ==true) ? "<td> <input type='checkbox' name='writers[]'  class='toggle-one' checked data-toggle='toggle'  onchange=switch_btn('writers_"+key+"_"+recipient+"_"+value.writers+"')></td>"  :  "<td> <input type='checkbox' name='writers[]'  class='toggle-one'  data-toggle='toggle'  onchange=switch_btn('writers_"+key+"_"+recipient+"_"+value.writers+"')></td>"  ): "<td> </td>";
                     tableUsers += "<td>";
-                    tableUsers += (!!key) ? "<button type='button'  class='btn btn-danger' onclick='myFunction()' data-target='#delete" + key.split("/")[1] + "' >"
+                    tableUsers += (!!key) ? "<button type='button'  class='btn btn-danger' onclick=removeUser('"+value.name.split(" ")[0]+"_"+key+"_"+recipient+"') >"
                         + "<span class='glyphicon glyphicon-remove'></span></button>"
-                        + "<div class='modal fade' id='delete" + key.split("/")[1]  + "' tabindex='-1'  role='dialog'>"
-                        + "<div class='modal-dialog modal-sm' role='document'>"
-                        + " <div class='modal-content'>"
-                        + "<div class='modal-body'>"
-                        + "Do you want to delete : <strong>" + value.name  + "</strong> ?"
-                        + "</div>"
-                        + "<div class='modal-footer'>"
-                        + "<button type='button' class='btn btn-default' data-dismiss='modal'>No</button>"
-                        + "<button type='button' class='btn btn-primary' onclick=OpenBtnPages('delete_" + key  + "')>Yes</button>"
-                        + "</div>"
-                        + "</div>"
-                        + "</div>"
-                        + "</div>"
                         : " ";
                     tableUsers+="</td></tr>";
-
                 }
                 tableUsers += "</table></div>";
                 table_user.innerHTML = tableUsers;
                 $('#tableUser').DataTable();
+                $('.toggle-one').bootstrapToggle();
             }
             });
     });
    
 }
-function myFunction() {
-    var txt;
-    if (confirm("Press a button!")) {
-      txt = "You pressed OK!";
-    } else {
-      txt = "You pressed Cancel!";
+
+function switch_btn(value_change){
+    var split_val = value_change.split("_");
+
+    if(split_val[0]==="readers"){
+        getData("/acls/" + split_val[2]).then(response => response.json())
+        .then(acl_datas => {
+            if(split_val[3]==="true"){
+                acl_datas.readers =  acl_datas.readers.filter(item => item !== split_val[1]);
+            }else{
+                acl_datas.readers =[...acl_datas.readers, split_val[1]];
+            }
+            console.log(acl_datas.readers);
+            putData('/acls/' + split_val[2], acl_datas).then(respons => {
+                if (respons.status == 200) {
+                    $('#acl_user')[0].reset();
+                    data = {};
+                    $('#drop').multiselect('refresh');
+                    loadTable(split_val[2]);
+                    dropdown(split_val[2]);
+                }
+            });
+        });
     }
-    console.log(txt);
+    if(split_val[0]==="writers"){
+        getData("/acls/" + split_val[2]).then(response => response.json())
+        .then(acl_datas => {
+            if(split_val[3]==="true"){
+                acl_datas.writers =  acl_datas.writers.filter(item => item !== split_val[1]);
+            }else{
+                acl_datas.writers =[...acl_datas.writers, split_val[1]];
+            }
+            console.log(acl_datas.readers);
+            putData('/acls/' + split_val[2], acl_datas).then(respons => {
+                if (respons.status == 200) {
+                    $('#acl_user')[0].reset();
+                    data = {};
+                    $('#drop').multiselect('refresh');
+                    loadTable(split_val[2]);
+                    dropdown(split_val[2]);
+                }
+            });
+        });
+    }
+    
+}
+function removeUser(name) {
+    if (confirm("Do you want remove "+name.split("_")[0]+" ?")) {
+        getData("/acls/" + name.split("_")[2]).then(response => response.json())
+        .then(acl_datas => {
+            acl_datas.readers =  acl_datas.readers.filter(item => item !== name.split("_")[1]);
+            acl_datas.writers =  acl_datas.writers.filter(item => item !== name.split("_")[1]);
+            putData('/acls/' + name.split("_")[2], acl_datas).then(respons => {
+                if (respons.status == 200) {
+                    $('#acl_user')[0].reset();
+                    data = {};
+                    $('#drop').multiselect('refresh');
+                    loadTable(name.split("_")[2]);
+                    dropdown(name.split("_")[2]);
+                }
+            });
+        });
+    } 
+    
   }
 
 function dropdown(recipient){

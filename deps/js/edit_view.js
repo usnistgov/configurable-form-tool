@@ -100,21 +100,31 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                         + "</div>"
                         + "</div>"
                         + "</div>";
-                    page_name += "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#share" + GetURLParameter('id').split("/")[1] + "' >"
-                        + "<i class='fas fa-share-alt'></i></button></span>"
-                        + "<div class='modal fade' id='share" + GetURLParameter('id').split("/")[1] + "' tabindex='-1' role='dialog' aria-labelledby='myModalLabel'>"
-                        + "<div class='modal-dialog' role='document'>"
+                        page_name +=  "<button type='button' class='btn btn-primary' data-toggle='modal' data-id='" + GetURLParameter('id') + "' data-target='#shareModal'>"
+                        + "<i class='fas fa-share-alt'></i></button>"
+                        + "<div class='modal fade' id='shareModal' role='dialog'  tabindex='-1'  >"
+                        + "<div class='modal-dialog modal-lg' role='document'>"
                         + " <div class='modal-content'>"
                         + "  <div class='modal-header'>"
                         + "<button type='button' class='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>&times;</span></button>"
                         + "<h4 class='modal-title' id='myModalLabel'>Share</h4>"
                         + "</div>"
                         + "<div class='modal-body'>"
-                        + "Do you want to delete ?"
+                        + "<form id='acl_user' class='form-inline'>"
+                        + "<div class='form-group' id='select_drop'>"
+                        + "</div>"
+                        + "<div class='checkbox'> <label>"
+                        + "<input type='checkbox' id='read' class='form-check-input' name='read' value='read' required>Can Read"
+                        + "</label></div>"
+                        + "<div class='checkbox'> <label>"
+                        + "<input type='checkbox' id='write' class='form-check-input'  name='write' value='write' required>Can write"
+                        + "</label></div>"
+                        + "<button  type='submit' id='submit_btn' class='btn btn-default'>Add</button>"
+                        + "</form>"
+                        + "<hr>"
+                        + "<div id='table_user'></div>"
                         + "</div>"
                         + "<div class='modal-footer'>"
-                        + "<button type='button' class='btn btn-default' data-dismiss='modal'>No</button>"
-                        + "<button type='button' class='btn btn-primary' onclick=OpenBtnPage('share_" + GetURLParameter('id') + "_" + GetURLParameter('type') + "')>Yes</button>"
                         + "</div>"
                         + "</div>"
                         + "</div>"
@@ -143,8 +153,69 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                                 elements[i].disabled = true;
                             }
                         });
-
-
+                    
+                        $('#shareModal').on('hidden.bs.modal', function (e) {
+                            $('#acl_user')[0].reset();
+                            location.reload();
+                        });
+                        $('#shareModal').on('show.bs.modal', function (event) {
+                            
+                            var button = $(event.relatedTarget); // Button that triggered the modal
+                            var recipient = button.data('id'); // Extract info from data-* attributes   
+            
+                            $('#submit_btn').click(function (e) {
+                                e.preventDefault();
+                                
+                                var data = {
+                                    readers: [],
+                                    writers: []
+                                };
+            
+                                if ($('#read').is(":checked")) {
+                                    data.readers = $('#drop').val();
+                                }
+                                if ($('#write').is(":checked")) {
+                                    data.writers = $('#drop').val();
+                                }
+                                console.log(data.writers);
+                                console.log(data.readers);
+                                console.log(data);
+                                if(data.writers === null && data.readers ===null){
+                                    alert("You must select a user");
+                                }else{
+                                    if(data.writers.length === 0 && data.readers.length ===0){
+                                        alert("You must check at least one box");
+                                    }else{
+                                        getData("/acls/" + recipient).then(response => response.json())
+                                        .then(acl_datas => {
+                                            if (!!acl_datas && typeof acl_datas.readers !== "undefined" && acl_datas.readers !== null
+                                                && typeof acl_datas.writers !== "undefined" && acl_datas.writers !== null) {
+                                                data.readers = data.readers.concat(acl_datas.readers);
+                                                data.writers = data.writers.concat(acl_datas.writers);
+                                                
+                                            }
+                                            putData('/acls/' + recipient, data).then(respons => {
+                                                if (respons.status == 200) {
+                                                    $('#acl_user')[0].reset();
+                                                    data = {};
+                                                    $('#drop').multiselect('refresh');
+                                                    loadTable(recipient);
+                                                    dropdown(recipient);
+                                                }
+                                            });
+                
+                                        });
+                                    }
+                                    
+                                }
+                                
+                            });
+                            loadTable(recipient);
+                            dropdown(recipient);
+                            
+                        });
+            
+                             
 
                 } else if (GetURLParameter('mode') === "delete") {
 
