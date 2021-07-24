@@ -100,7 +100,7 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                         + "</div>"
                         + "</div>"
                         + "</div>";
-                        page_name +=  "<button type='button' class='btn btn-primary' data-toggle='modal' data-id='" + GetURLParameter('id') + "' data-target='#shareModal'>"
+                        page_name +=  "<button type='button' class='btn btn-primary' data-toggle='modal' data-id='" + GetURLParameter('id') + "_"+datas.results[0].metadata["createdBy"]+"' data-target='#shareModal'>"
                         + "<i class='fas fa-share-alt'></i></button>"
                         + "<div class='modal fade' id='shareModal' role='dialog'  tabindex='-1'  >"
                         + "<div class='modal-dialog modal-lg' role='document'>"
@@ -159,10 +159,14 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                             location.reload();
                         });
                         $('#shareModal').on('show.bs.modal', function (event) {
-                            
+                
                             var button = $(event.relatedTarget); // Button that triggered the modal
-                            var recipient = button.data('id'); // Extract info from data-* attributes   
-            
+                            var split_values = button.data('id'); // Extract info from data-* attributes   
+                            split_values= split_values.split("_");
+                            var recipient = split_values[0];
+                           
+                            var userIdCreateEntry=split_values[1];
+                            
                             $('#submit_btn').click(function (e) {
                                 e.preventDefault();
                                 
@@ -177,9 +181,7 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                                 if ($('#write').is(":checked")) {
                                     data.writers = $('#drop').val();
                                 }
-                                console.log(data.writers);
-                                console.log(data.readers);
-                                console.log(data);
+                                
                                 if(data.writers === null && data.readers ===null){
                                     alert("You must select a user");
                                 }else{
@@ -199,7 +201,7 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                                                     $('#acl_user')[0].reset();
                                                     data = {};
                                                     $('#drop').multiselect('refresh');
-                                                    loadTable(recipient);
+                                                    loadTable(recipient,userIdCreateEntry);
                                                     dropdown(recipient);
                                                 }
                                             });
@@ -210,7 +212,7 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                                 }
                                 
                             });
-                            loadTable(recipient);
+                            loadTable(recipient,userIdCreateEntry);
                             dropdown(recipient);
                             
                         });

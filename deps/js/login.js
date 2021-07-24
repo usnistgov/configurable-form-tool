@@ -21,7 +21,7 @@ async function loginUser(username, password) {
 
 	if (!response.ok) {
 		console.log('auth failed');
-		alert("Login failed: bad request!");
+		alert("Login failed: bad request! Your username or password is incorrect");
 		return false;
 	}
 

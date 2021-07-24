@@ -142,3 +142,8 @@
         .navbar-brand{
             padding: 10px 16px;
         }
+        .select_class{
+            background-color: #337ab7; 
+            color: #fff;
+            width: auto !important;
+        }
