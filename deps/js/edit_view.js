@@ -20,12 +20,20 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
     typeof GetURLParameter('type') !== "undefined" && GetURLParameter('type') !== null) {
         localStorage.setItem("message", "");
     var wrapperForm = document.getElementById("contentTab");
+    var payloadWrapper = document.getElementById("displayPlayload");
+    var payloadHTML="";
     var myHTML = "";
     var urlParameter = GetURLParameter('mode');
     getData("/objects/?query=type:" + GetURLParameter('type') + " AND /id" + GetURLParameter('id'))
         .then(response => response.json())
         .then(datas => {
             if (!!datas) {
+                if(datas.results[0].payloads){
+                    datas.results[0].payloads.forEach(elt=>{
+                        payloadHTML+="<a href="+CORDRA_HTTPS_URL+"/objects/"+datas.results[0].content['@id']+"?payload=filename target='_blank'>"+elt.filename+"</a>";
+                    });
+                }
+                
                 if (urlParameter === "edit") {
                     //edit mode is where the user can edit a form
                     myHTML += "<form id=" + datas.results[0].content['formAlternateName'] + "> </form>";
@@ -33,52 +41,47 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                     getData("/objects/?query=jsonform AND /alternateName:" + datas.results[0].content['formAlternateName'])
                         .then(response => response.json())
                         .then(data => {
+                            var formatValues = { "enum": [], "titleMap": {} };
+                            var values = {};
+                            var selectValues = [];
+                            
 
                             data.results.forEach(element => {
-                                $('form#' + element.content.alternateName).jsonForm({
-                                    "schema": element.content.schema,
-                                    "form": element.content.form,
-                                    "value": datas.results[0].content,
-                                    "onSubmitValid": function (values) {
-                                        
-                                        if (!!document.querySelector('input[type=file]')) {
-                                            var file = document.querySelector('input[type=file]').files[0];
-                                            var data_form = new FormData();
-                                            data_form.append('content', JSON.stringify(values));
-                                            data_form.append('name', 'file');
-                                            data_form.append('filename', file);
-                                            fetch(CORDRA_HTTPS_URL + '/objects/' + datas.results[0].content['@id'], {
-                                                method: 'PUT',
-                                                headers: {
-                                                    'Authorization': 'Bearer ' + authdata['token'],
-                                                },
-                                                body: data_form
-                                            })
-                                                .then(r => {
-                                                    if (response.status == 200) {
-                                                        alert("The form was submitted successfully.");
-                                                        localStorage.setItem("message", "The form was modified  successfully.");
-                                                        $('form#' + element.content.alternateName)[0].reset();
-                                                        window.location.replace(localStorage.getItem("redirect"));
-                                                    }
-                                                })
-                                        } else {
-                                            putData('/objects/' + datas.results[0].content['@id'], values)
-                                                .then(response => {
-                                                    if (response.status == 200) {
-                                                        console.log("Successful");
-                                                        alert("The form was submitted successfully.");
-                                                        localStorage.setItem("message", "The form was modified  successfully.");
-                                                        $('form#' + element.content.alternateName)[0].reset();
-                                                        window.location.replace(localStorage.getItem("redirect"));
-                                                    }
-                                                });
-                                        }
+                                var queries = element.content.form.filter(item => {
+                                    if (item.cordra) {
+                                        return item.cordra;
                                     }
-                                })
+                                });
+                                if (queries.length > 0) {
+                                    getData("/objects/?query=" + queries[0].cordra.query + "&filter=['/content/@id','/content/name']")
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            data.results.forEach(elt => {
+                                                selectValues.push(elt.content['@id']);
+                                                values[elt.content['@id']] = elt.content['name'];
+                
+                                            });
+                                            formatValues.enum = selectValues;
+                                            formatValues.titleMap = values;
+                
+                                            element.content.form.forEach(item => {
+                                                if (item.cordra) {
+                                                    item.titleMap = values;
+                                                    element.content.schema[item.key].enum = selectValues;
+                                                }
+                                            });
+                                            modifiedForm(element.content,datas);
+                                        });
+                
+                                }else{
+                                    modifiedForm(element.content,datas);
+                                }
+                    
                             });
                         });
                 } else if (GetURLParameter('mode') === "view") {
+                    
+                    // retrieving image https://sandbox.materialhub.org/objects/prefix/4fa85d7e562fcd1d251a?payload=filename
                     // View mode is where all values are available in certain format
                     //wrapperForm.appendChild(prettyPrint(datas.results));
                     localStorage.setItem("message", "");
@@ -135,17 +138,59 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                     getData("/objects/?query=jsonform AND /alternateName:" + datas.results[0].content['formAlternateName'])
                         .then(response => response.json())
                         .then(data => {
-                            
+                            var formatValues = { "enum": [], "titleMap": {} };
+                            var values = {};
+                            var selectValues = [];
                             data.results.forEach(element => {
-                               
+                                var queries = element.content.form.filter(item => {
+                                    if (item.cordra) {
+                                        return item.cordra;
+                                    }
+                                });
+                                if (queries.length > 0) {
+                                    getData("/objects/?query=" + queries[0].cordra.query + "&filter=['/content/@id','/content/name']")
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            data.results.forEach(elt => {
+                                                selectValues.push(elt.content['@id']);
+                                                values[elt.content['@id']] = elt.content['name'];
+                
+                                            });
+                                            formatValues.enum = selectValues;
+                                            formatValues.titleMap = values;
+                
+                                            element.content.form.forEach(item => {
+                                                if (item.cordra) {
+                                                    item.titleMap = values;
+                                                    element.content.schema[item.key].enum = selectValues;
+                                                }
+                                            });
+                                            $('form#' + element.content.alternateName).jsonForm({
+                                                "schema": element.content.schema,
+                                                "form": element.content.form,
+                                                "value": datas.results[0].content
+            
+                                            });
+                                            var form = document.getElementById(datas.results[0].content['formAlternateName']);
+                                            var elements = form.elements;
+                                            for (var i = 0; i < elements.length; ++i) {
+                                                elements[i].disabled = true;
+                                            }
+                                           // modifiedForm(element.content,datas);
+                                        });
+                
+                                }else{
+                                    $('form#' + element.content.alternateName).jsonForm({
+                                        "schema": element.content.schema,
+                                        "form": element.content.form,
+                                        "value": datas.results[0].content
+    
+                                    });
+                                    //modifiedForm(element.content,datas);
+                                }
                                     //delete element.content.form[element.content.form.length-1];
+                                    
                                 
-                                $('form#' + element.content.alternateName).jsonForm({
-                                    "schema": element.content.schema,
-                                    "form": element.content.form,
-                                    "value": datas.results[0].content
-
-                                })
                             });
                             var form = document.getElementById(datas.results[0].content['formAlternateName']);
                             var elements = form.elements;
@@ -231,9 +276,55 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                             }
                         });
                 }
+
+                payloadWrapper.innerHTML=payloadHTML;
             }
 
 
         });
 
+}
+
+function modifiedForm(content,datas){
+    $('form#' + content.alternateName).jsonForm({
+        "schema": content.schema,
+        "form": content.form,
+        "value": datas.results[0].content,
+        "onSubmitValid": function (values) {
+            
+            if (!!document.querySelector('input[type=file]')) {
+                var file = document.querySelector('input[type=file]').files[0];
+                var data_form = new FormData();
+                data_form.append('content', JSON.stringify(values));
+                data_form.append('name', 'file');
+                data_form.append('filename', file);
+                fetch(CORDRA_HTTPS_URL + '/objects/' + datas.results[0].content['@id'], {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': 'Bearer ' + authdata['token'],
+                    },
+                    body: data_form
+                })
+                    .then(r => {
+                        if (response.status == 200) {
+                            alert("The form was submitted successfully.");
+                            localStorage.setItem("message", "The form was modified  successfully.");
+                            $('form#' + content.alternateName)[0].reset();
+                            window.location.replace(localStorage.getItem("redirect"));
+                        }
+                    })
+            } else {
+                putData('/objects/' + datas.results[0].content['@id'], values)
+                    .then(response => {
+                        if (response.status == 200) {
+                            console.log("Successful");
+                            alert("The form was submitted successfully.");
+                            localStorage.setItem("message", "The form was modified  successfully.");
+                            $('form#' + content.alternateName)[0].reset();
+                            window.location.replace(localStorage.getItem("redirect"));
+                        }
+                    });
+            }
+        }
+    });
 }

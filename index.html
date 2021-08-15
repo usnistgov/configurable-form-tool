@@ -11,7 +11,7 @@
     <link rel="icon" href="./deps/img/form-tool-logo-transparent.png">
     <link rel="canonical" href="">
 
-    <title>Dashboard Template for Bootstrap</title>
+    <title>Laboratory Metadata Capture</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="./deps/opt/bootstrap.css">
@@ -38,7 +38,7 @@
     <script type="text/javascript" src="./lib/jsonform.js"></script>
 </head>
 
-<body>
+<body onload="sidebarF('','')">
 
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container-fluid">
@@ -76,25 +76,17 @@
         <div class="row">
             
             <div class="col-sm-3 col-md-2 sidebar">
-                <h4>Filter Forms:</h4>
+                <h4>Filter Forms: <button style="font-size: 13px;" onclick="ResetFilter()"> Reset</button></h4>
                 <form>
-                    <div class="form-group">
-                        <select class="form-control select_class"> 
-                            <option selected="selected">Primary Filter</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
-                            <option>5</option>
+                    <div class="form-group" id="primary_select">
+                        <select class="form-control select_class">
+                            <option  selected="selected">Primary Filter</option>
                           </select>
                     </div>
-                    <div class="form-group ">
+                    <div class="form-group" id="secondary_select">
                         <select class="form-control select_class">
                             <option  selected="selected">Secondary Filter</option>
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
-                            <option>5</option>
-                          </select>
+                        </select>
                     </div>
                   </form>
                 <ul class="nav nav-sidebar" id="tab">
@@ -111,6 +103,10 @@
                 <div id="contentTab">
 
                 </div>
+                <div id="contentTabTest">
+
+                </div>
+                <div id="displayPlayload"></div>
             </div>
 
         </div>
@@ -129,8 +125,6 @@
 <script src="./deps/js/sidebar.js"></script>
 <!--Script to create tables that will display content -->
 <script src="./deps/js/create_table.js"></script>
-<!--Script to upload file  -->
-<script src="./deps/js/upload_file.js"></script>
 <!--Script to create Form -->
 <script src="./deps/js/createForm.js"></script>
 <!--Script to edit and view data element from the  Form -->
@@ -148,6 +142,21 @@
     if(!!sessionStorage.getItem("username")){
         document.getElementById( 'username' ).innerHTML = sessionStorage.getItem("username");
     }
-    
+    function ResetFilter(){
+        document.getElementById("primary_key").value = '';
+        if(document.getElementById("secondary_key")){
+            document.getElementById("secondary_key").value='';
+        }
+        
+        localStorage.setItem("primary_filter", "");
+        localStorage.setItem("secondary_filter", "");
+        sidebarF('','');
+
+    }
+    if(document.getElementById('jsonform-1-elt-dateModified')){
+        var today = new Date();
+        document.querySelector('input[name="dateModified"]').value =today.toISOString().substr(0, 10);
+        //document.getElementById('jsonform-1-elt-dateModified').value =today.toISOString().substr(0, 10);
+    }
 </script>
 </html>
