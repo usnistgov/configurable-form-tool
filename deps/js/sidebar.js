@@ -1,52 +1,6 @@
 
 
-  
-function primaryFunction(){
-    var x = document.getElementById("primary_key").value;
-    if(localStorage.getItem("primary_filter") !== x){
-        localStorage.setItem("secondary_filter", "");
-    }
-    localStorage.setItem("primary_filter", x);
-    var secondary_S ="";
-    if(localStorage.getItem("secondary_filter")){
-        secondary_S = localStorage.getItem("secondary_filter");
-    }else{
-        localStorage.setItem("secondary_filter", "");
-    }
-    
-    var secondary = new Set();
-    var secondary_select="";
-    var secondaryWrapper = document.getElementById("secondary_select");
-    secondary_select+="<select id='secondary_key' class='form-control select_class' onchange=secondaryFunction('"+x+"')> ";
-    secondary_select+="<option value='' selected='selected'>Secondary Filter</option>";
-    getData("/objects/?query=jsonform&filter=['/content/filterPrimary','/content/filterSecondary']")
-    .then(response => response.json())
-    .then(data => { 
-    data.results.forEach(elmt =>{
-        if(elmt.content.hasOwnProperty('filterPrimary')===true){
-            elmt.content.filterPrimary.filter(item =>{
-                if(item==x){
-                    if(!!elmt.content.filterSecondary){
-                        elmt.content.filterSecondary.forEach(value=>secondary.add(value));
-                    }
-                }
-            });
-        }
-    });
-    
-    for (let item of secondary.values()){
-        if(item === secondary_S){
-            secondary_select+="<option value='"+item+"' selected='selected'>"+item+"</option>";  
-        }else{
-            secondary_select+="<option value='"+item+"'>"+item+"</option>";
-        }
-            
-        }
-    secondary_select+="</select>";
-    secondaryWrapper.innerHTML = secondary_select;
-});
 
-}
 function secondaryFunction(first){
     var second = document.getElementById("secondary_key").value;
     localStorage.setItem("primary_filter", first);
@@ -69,6 +23,7 @@ function sidebarF(primaryV, secondary){
     }else if(secondary_S){
         filter+=" AND /filterSecondary/_:"+secondary_S;
     }
+    
 getData("/objects/?query=type:Form"+filter)
 .then(response => response.json())
 .then(data => {
@@ -126,6 +81,59 @@ getData("/objects/?query=type:Form"+filter)
     }
     wrapper.innerHTML = myHTML;
     primaryWrapper.innerHTML = primary_select;
+
+    
     primaryFunction();
 });
+}
+
+  
+function primaryFunction(){
+
+    var x = document.getElementById("primary_key").value;
+    
+    if(localStorage.getItem("primary_filter") !== x){
+        localStorage.setItem("secondary_filter", "");
+    }
+    localStorage.setItem("primary_filter", x);
+    var secondary_S ="";
+    if(localStorage.getItem("secondary_filter")){
+        secondary_S = localStorage.getItem("secondary_filter");
+    }else{
+        localStorage.setItem("secondary_filter", "");
+    }
+   // sidebarF(x,secondary_S);
+    
+    var secondary = new Set();
+    var secondary_select="";
+    var secondaryWrapper = document.getElementById("secondary_select");
+    secondary_select+="<select id='secondary_key' class='form-control select_class' onchange=secondaryFunction('"+x+"')> ";
+    secondary_select+="<option value='' selected='selected'>Secondary Filter</option>";
+    getData("/objects/?query=jsonform&filter=['/content/filterPrimary','/content/filterSecondary']")
+    .then(response => response.json())
+    .then(data => { 
+    data.results.forEach(elmt =>{
+        if(elmt.content.hasOwnProperty('filterPrimary')===true){
+            elmt.content.filterPrimary.filter(item =>{
+                if(item==x){
+                    if(!!elmt.content.filterSecondary){
+                        elmt.content.filterSecondary.forEach(value=>secondary.add(value));
+                    }
+                }
+            });
+        }
+    });
+    
+    for (let item of secondary.values()){
+        if(item === secondary_S){
+            secondary_select+="<option value='"+item+"' selected='selected'>"+item+"</option>";  
+        }else{
+            secondary_select+="<option value='"+item+"'>"+item+"</option>";
+        }
+            
+    }
+    secondary_select+="</select>";
+    secondaryWrapper.innerHTML = secondary_select;
+    });
+   
 }

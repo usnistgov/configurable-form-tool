@@ -41,7 +41,7 @@ function createForm(formname) {
                         });
 
                 } else {
-                   createFormJson(element.content);
+                    createFormJson(element.content);
                 }
             });
         });
@@ -76,7 +76,7 @@ function createFormJson(content) {
                                     document.getElementById("msg").style.display = "block";
                                     $("#msg").hide(1000);
                                     alert("The form was submitted successfully.");
-                                    $('form#' +content.alternateName)[0].reset();
+                                    $('form#' + content.alternateName)[0].reset();
                                     localStorage.setItem("message", "The form was submitted successfully.");
                                     window.location.replace(localStorage.getItem("redirect"));
                                 }
@@ -104,7 +104,7 @@ function createFormJson(content) {
                                 });
                             });
                         }
-                });
+                    });
             }
 
         }
