@@ -72,6 +72,8 @@ async function logoutUser() {
 	sessionStorage.removeItem("username");
 	sessionStorage.removeItem("authToken");
 	sessionStorage.removeItem("userId");
+	localStorage.setItem("primary_filter", "");
+    localStorage.setItem("secondary_filter", "");
 
 	// force reload since we logged out
 	location.reload();
