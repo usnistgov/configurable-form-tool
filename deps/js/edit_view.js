@@ -34,7 +34,6 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
             if (!!datas) {
                 if (datas.results[0].payloads) {
                     datas.results[0].payloads.forEach(elt => {
-                        console.log(elt);
                         fetch(CORDRA_HTTPS_URL + '/objects/' + datas.results[0].content['@id'] + '?' + new URLSearchParams({ payload: 'upload', disposition: 'attachment' }).toString(), {
                             method: 'GET',
                             headers: {
