@@ -48,30 +48,50 @@ function createForm(formname) {
 }
 
 function createFormJson(content) {
+    var files = content.form.filter(item => item.type === "file");
     $('form#' + content.alternateName).jsonForm({
         "schema": content.schema,
         "form": content.form,
         "onSubmitValid": function (values) {
             if (!!document.querySelector('input[type=file]')) {
-                var file = document.querySelector('input[type=file]').files[0];
+                //var file = document.querySelector('input[type=file]').files[0];
                 var data_form = new FormData();
+                files.forEach(item => {
+                    var file = document.querySelector('input[name=' + item['key'] + ']').files[0];
+                    console.log(file);
+                    if (file) {
+                        data_form.append(item['key'], file);
+                        values[item['key']] = new URLSearchParams({ payload: item['key'], disposition: 'attachment'}).toString();
+                    } else {
+                        values[item['key']] = "";
+                    }
+                    
+                });
                 data_form.append('content', JSON.stringify(values));
-                data_form.append('name', 'file');
-                data_form.append('upload', file);
+                //data_form.append('upload', file);
                 fetch(CORDRA_HTTPS_URL + '/objects/?type=' + content.cordraSchema, {
                     method: 'POST',
                     headers: {
                         'Authorization': 'Bearer ' + authdata['token'],
+                        
                     },
                     body: data_form
                 }).then(response => response.json())
                     .then(r => {
+                        console.log(r);
                         if (response.status == 200) {
-                            const data = {
+                            let data = {
                                 "readers": [sessionStorage.getItem("userId")],
-                                "writers": [sessionStorage.getItem("userId")]
+                                "writers": [sessionStorage.getItem("userId")],
                             };
-                            putData('/acls/' + r['@id'], data).then(response => {
+                            files.forEach(item => {
+                                if (r[item['key']]) {
+                                    values[item['key']] = CORDRA_HTTPS_URL + '/objects/' + r['@id'] + '?' +
+                                        new URLSearchParams({ payload: item['key'], disposition: 'attachment' }).toString();
+                                }
+                            });
+                            putData('/objects/' + r['@id'], values).then(resp => console.log(resp.status));
+                            putData('/acls/' + r['@id'],data).then(response => {
                                 if (response.status == 200) {
                                     document.getElementById("msg").style.display = "block";
                                     $("#msg").hide(1000);

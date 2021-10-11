@@ -29,7 +29,6 @@ if (typeof GetURLParameter('formname') !== "undefined" && GetURLParameter('formn
 ) {
 
     var wrapperTable = document.getElementById("contentTab");
-    var wrapperTableTest = document.getElementById("contentTabTest");
     var page_name = "";
     var urlValue = (decodeURIComponent(GetURLParameter('formname')) + "/" + GetURLParameter('altname') + "/" + GetURLParameter('schema')).split("/");
 
@@ -64,11 +63,23 @@ if (typeof GetURLParameter('formname') !== "undefined" && GetURLParameter('formn
                         data.results.forEach(element => {
                             dataTableColumns.results[0].content.tableColumns.forEach(el => {
                                 if (el.type === "string") {
-                                    tableTest += "<td scope='row'>" + element.content[el.property] + "</td>";
+                                    tableTest += "<td scope='row'> " + element.content[el.property] + "</td>";
                                 } else if (el.type === "hyperlink") {
                                     tableTest += "<td scope='row'> <a style='color: #337ab7 !important;' href=" + element.content[el.property] + " target='_blank' rel='noopener noreferrer'>" + element.content[el.property] + "</a></td>";
-                                } else if (el.type === "image") {
-                                    tableTest += "<td scope='row'>" + element.content[el.property] + "</td>";
+                                } else if (el.type === "image" ) {
+                                    tableTest += "<td scope='row' id='" + element.content[el.property] + "'> </td>";
+                                    if (element.content[el.property] != "") {
+                                        fetch(element.content[el.property], {
+                                            method: 'GET',
+                                            headers: {
+                                                'Authorization': 'Bearer ' + authdata['token'],
+                                            }
+                                        }).then(response => validateResponse(response))
+                                            .then(Blod => readResponseAsBlob(Blod))
+                                            .then(value => showImage_tb(value, element.content[el.property],el.title))
+                                            .catch(error => logError(error));
+                                    }
+                                        
                                 } else if (el.type === "action") {
                                     if (!!element.content) {
                                         tableElmt = element.content['@id'];
@@ -132,10 +143,10 @@ if (typeof GetURLParameter('formname') !== "undefined" && GetURLParameter('formn
                         document.getElementById("page-header").innerHTML = page_name;
                         tableTest += "</tbody></table></div></div>";
                         if (!!tableTest) {
-                            wrapperTableTest.innerHTML = tableTest;
+                            wrapperTable.innerHTML = tableTest;
                         }
                         else {
-                            wrapperTableTest.innerHTML = "";
+                            wrapperTable.innerHTML = "";
                         }
                         $('#table_id').DataTable();
                         $('#shareModal').on('hidden.bs.modal', function (e) {
@@ -178,7 +189,6 @@ if (typeof GetURLParameter('formname') !== "undefined" && GetURLParameter('formn
                                                     && typeof acl_datas.writers !== "undefined" && acl_datas.writers !== null) {
                                                     data.readers = data.readers.concat(acl_datas.readers);
                                                     data.writers = data.writers.concat(acl_datas.writers);
-
                                                 }
                                                 putData('/acls/' + recipient, data).then(respons => {
                                                     if (respons.status == 200) {

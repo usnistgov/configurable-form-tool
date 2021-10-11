@@ -2,11 +2,11 @@
 * Function which  helps to split the value on every button(Edit, Delete, view) and send it to the url
 */
 function OpenBtnPage(id) {
-   
+
     if (typeof id !== "undefined" && id !== null) {
         var result = id.split("_");
 
-        window.location.replace("index.html?id=" + result[1] + "&mode=" + result[0] + "&type=" + result[2]+ "&formname=" + result[3]);
+        window.location.replace("index.html?id=" + result[1] + "&mode=" + result[0] + "&type=" + result[2] + "&formname=" + result[3]);
     }
 
 }
@@ -18,13 +18,13 @@ function OpenBtnPage(id) {
    */
 if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== null &&
     typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !== null &&
-    typeof GetURLParameter('type') !== "undefined" && GetURLParameter('type') !== null && 
+    typeof GetURLParameter('type') !== "undefined" && GetURLParameter('type') !== null &&
     typeof GetURLParameter('formname') !== "undefined" && GetURLParameter('formname') !== null) {
     localStorage.setItem("message", "");
     var wrapperForm = document.getElementById("contentTab");
     var payloadWrapper = document.getElementById("displayPlayload");
     var header_name = decodeURIComponent(GetURLParameter('formname'));
-    
+
     var payloadHTML = "";
     var myHTML = "";
     var urlParameter = GetURLParameter('mode');
@@ -34,12 +34,16 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
             if (!!datas) {
                 if (datas.results[0].payloads) {
                     datas.results[0].payloads.forEach(elt => {
-                        /*fetch(CORDRA_HTTPS_URL + '/objects/' + datas.results[0].content['@id']+ '?'+new URLSearchParams({payload:'upload', disposition:'attachment'}).toString(), {
+                        console.log(elt);
+                        fetch(CORDRA_HTTPS_URL + '/objects/' + datas.results[0].content['@id'] + '?' + new URLSearchParams({ payload: 'upload', disposition: 'attachment' }).toString(), {
                             method: 'GET',
                             headers: {
                                 'Authorization': 'Bearer ' + authdata['token'],
                             }
-                        }).then(payloadFile => console.log(payloadFile  ));*/
+                        }).then(response => validateResponse(response))
+                            .then(Blod => readResponseAsBlob(Blod))
+                            .then(value => showImage(value, elt.filename))
+                            .catch(error => logError(error));
 
                         payloadHTML += "<a href=" + CORDRA_HTTPS_URL + "/objects/" + datas.results[0].content['@id'] + "?payload=upload download=" + CORDRA_HTTPS_URL + "/objects/" + datas.results[0].content['@id'] + "?payload=upload >" + elt.filename + "</a>";
                     });
@@ -47,7 +51,7 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
 
                 if (urlParameter === "edit") {
                     //edit mode is where the user can edit a form
-                    myHTML += "<h1 class='page-header'>" + header_name.charAt(0).toUpperCase() + header_name.slice(1)+"</h1>";
+                    myHTML += "<h1 class='page-header'>" + header_name.charAt(0).toUpperCase() + header_name.slice(1) + "</h1>";
                     myHTML += "<form id=" + datas.results[0].content['formAlternateName'] + "> </form>";
                     wrapperForm.innerHTML = myHTML;
                     getData("/objects/?query=jsonform AND /alternateName:" + datas.results[0].content['formAlternateName'])
@@ -56,8 +60,6 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                             var formatValues = { "enum": [], "titleMap": {} };
                             var values = {};
                             var selectValues = [];
-
-
                             data.results.forEach(element => {
                                 var queries = element.content.form.filter(item => {
                                     if (item.cordra) {
@@ -82,6 +84,7 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                                                     element.content.schema[item.key].enum = selectValues;
                                                 }
                                             });
+                                            
                                             modifiedForm(element.content, datas);
                                         });
 
@@ -98,19 +101,19 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                     //wrapperForm.appendChild(prettyPrint(datas.results));
                     localStorage.setItem("message", "");
                     var page_name = "<h1 class='page-header'>" + header_name.charAt(0).toUpperCase() + header_name.slice(1);
-                    page_name += "<span class='page-header' style='float: right; margin-left: 10px;margin-right: 20px;'><button type='button' class='btn btn-primary' onclick=OpenBtnPage('edit_" + GetURLParameter('id') + "_" + GetURLParameter('type') + "_"+GetURLParameter('formname')+"')>"
+                    page_name += "<span class='page-header' style='float: right; margin-left: 10px;margin-right: 20px;'><button type='button' class='btn btn-primary' onclick=OpenBtnPage('edit_" + GetURLParameter('id') + "_" + GetURLParameter('type') + "_" + GetURLParameter('formname') + "')>"
                         + "<span class='glyphicon glyphicon-pencil'></span></button><button type='button' class='btn btn-danger' data-toggle='modal' data-target='#delete" + GetURLParameter('id').split("/")[1] + "'>"
                         + "<span class='glyphicon glyphicon-remove'></span></button><button type='button' class='btn btn-primary' data-toggle='modal' data-id='" + GetURLParameter('id') + "_" + datas.results[0].metadata["createdBy"] + "' data-target='#shareModal'>"
                         + "<i class='fas fa-share-alt'></i></button></h1>";
-                    page_name +=  "<div class='modal fade' id='delete" + GetURLParameter('id').split("/")[1] + "' tabindex='-1' role='dialog' aria-labelledby='myModalLabel'>"
+                    page_name += "<div class='modal fade' id='delete" + GetURLParameter('id').split("/")[1] + "' tabindex='-1' role='dialog' aria-labelledby='myModalLabel'>"
                         + "<div class='modal-dialog modal-sm' role='document'>"
                         + " <div class='modal-content'>"
                         + "<div class='modal-body'>"
-                        + "Do you want to delete : <strong>" +  GetURLParameter('id') + "</strong> ?"
+                        + "Do you want to delete : <strong>" + GetURLParameter('id') + "</strong> ?"
                         + "</div>"
                         + "<div class='modal-footer'>"
                         + "<button type='button' class='btn btn-default' data-dismiss='modal'>No</button>"
-                        + "<button type='button' class='btn btn-primary' onclick=OpenBtnPage('delete_" + GetURLParameter('id') + "_" + GetURLParameter('type') + "_"+GetURLParameter('formname')+"')>Yes</button>"
+                        + "<button type='button' class='btn btn-primary' onclick=OpenBtnPage('delete_" + GetURLParameter('id') + "_" + GetURLParameter('type') + "_" + GetURLParameter('formname') + "')>Yes</button>"
                         + "</div>"
                         + "</div>"
                         + "</div>"
@@ -284,7 +287,7 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                         });
                 }
 
-                payloadWrapper.innerHTML = payloadHTML;
+                //payloadWrapper.innerHTML = payloadHTML;
             }
 
 
@@ -292,39 +295,110 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
 
 }
 
+function readResponseAsBlob(response) {
+    return response.blob();
+}
+function showImage_tb(responseAsBlob, filename,name) {
+    if (responseAsBlob.type && responseAsBlob.type.includes("image")) {
+        var displayPlayload = document.getElementById(filename);
+        var imgElem = document.createElement('img');
+        var imgUrl = URL.createObjectURL(responseAsBlob);
+        var link = document.createTextNode(filename);
+        const a = document.createElement('a');
+        imgElem.style.cssText = "width:100px;height:100px;";
+        imgElem.src = imgUrl;
+        a.appendChild(imgElem);
+        a.href = imgUrl;
+        a.download = name+"."+responseAsBlob['type'].split('/')[1];
+        a.title = name+"."+responseAsBlob['type'].split('/')[1];
+        const clickHandler = () => {
+            setTimeout(() => {
+                URL.revokeObjectURL(imgUrl);
+                this.removeEventListener('click', clickHandler);
+            }, 150);
+        }
+        a.addEventListener('click', clickHandler, false);
+        displayPlayload.appendChild(a);
+        return imgElem;
+    }
+}
+function showImage(responseAsBlob, filename) {
+    var container = document.getElementById('link');
+    var displayPlayload = document.getElementById('displayPlayload');
+    var imgElem = document.createElement('img');
+    var imgUrl = URL.createObjectURL(responseAsBlob);
+    var link = document.createTextNode(filename)
+    const a = document.createElement('a');
+    imgElem.style.cssText = "width:100%";
+    displayPlayload.appendChild(imgElem);
+    a.appendChild(link);
+    a.href = imgUrl;
+    a.download = filename;
+    a.title = filename;
+    const clickHandler = () => {
+        setTimeout(() => {
+            URL.revokeObjectURL(imgUrl);
+            this.removeEventListener('click', clickHandler);
+        }, 150);
+    }
+    a.addEventListener('click', clickHandler, false);
+    container.appendChild(a);
+    imgElem.src = imgUrl;
+    if (responseAsBlob.type && responseAsBlob.type.includes("image")) {
+        if(displayPlayload) displayPlayload.appendChild(imgElem);
+    }
+}
+
+
+function logError(error) {
+    console.log('Looks like there was a problem: \n', error);
+}
+
+function validateResponse(response) {
+    if (!response.ok) {
+        throw Error(response.statusText);
+    }
+    return response;
+}
 function modifiedForm(content, datas) {
+    var files = content.form.filter(item => item.type === "file");
     $('form#' + content.alternateName).jsonForm({
         "schema": content.schema,
         "form": content.form,
         "value": datas.results[0].content,
         "onSubmitValid": function (values) {
-
-            if (!!document.querySelector('input[type=file]')) {
-                var file = document.querySelector('input[type=file]').files[0];
+            if (!!document.querySelector('input[type=file]')){
                 var data_form = new FormData();
+                files.forEach(item => {
+                    var file = document.querySelector('input[name=' + item['key'] + ']').files[0];
+                    if (file) {
+                        data_form.append(item['key'], document.querySelector('input[name=' + item['key'] + ']').files[0]);
+                        values[item['key']] = values[item['key']] = CORDRA_HTTPS_URL + '/objects/' + datas.results[0].content['@id'] + '?' +
+                            new URLSearchParams({ payload: item['key'], disposition: 'attachment' }).toString();
+                    } else {
+                        values[item['key']] = datas.results[0].content[item['key']];
+                    }
+                   
+                });
                 data_form.append('content', JSON.stringify(values));
-                data_form.append('name', 'file');
-                data_form.append('filename', file);
                 fetch(CORDRA_HTTPS_URL + '/objects/' + datas.results[0].content['@id'], {
                     method: 'PUT',
                     headers: {
                         'Authorization': 'Bearer ' + authdata['token'],
                     },
                     body: data_form
-                })
-                    .then(r => {
-                        if (response.status == 200) {
-                            alert("The form was submitted successfully.");
-                            localStorage.setItem("message", "The form was modified  successfully.");
-                            $('form#' + content.alternateName)[0].reset();
-                            window.location.replace(localStorage.getItem("redirect"));
-                        }
-                    })
+                }).then(r => {
+                    if (r.status == 200) {
+                        alert("The form was submitted successfully.");
+                        localStorage.setItem("message", "The form was modified  successfully.");
+                        $('form#' + content.alternateName)[0].reset();
+                        window.location.replace(localStorage.getItem("redirect"));
+                    }
+                });
             } else {
                 putData('/objects/' + datas.results[0].content['@id'], values)
                     .then(response => {
                         if (response.status == 200) {
-                            console.log("Successful");
                             alert("The form was submitted successfully.");
                             localStorage.setItem("message", "The form was modified  successfully.");
                             $('form#' + content.alternateName)[0].reset();
