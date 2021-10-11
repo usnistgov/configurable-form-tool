@@ -81,8 +81,6 @@ getData("/objects/?query=type:Form"+filter)
     }
     wrapper.innerHTML = myHTML;
     primaryWrapper.innerHTML = primary_select;
-
-    
     primaryFunction();
 });
 }
