@@ -68,7 +68,7 @@ if (typeof GetURLParameter('formname') !== "undefined" && GetURLParameter('formn
                                     tableTest += "<td scope='row'> <a style='color: #337ab7 !important;' href=" + element.content[el.property] + " target='_blank' rel='noopener noreferrer'>" + element.content[el.property] + "</a></td>";
                                 } else if (el.type === "image" ) {
                                     tableTest += "<td scope='row' id='" + element.content[el.property] + "'> </td>";
-                                    if (element.content[el.property] != "") {
+                                    if (element.content[el.property] != "" && element.content[el.property].includes(CORDRA_HTTPS_URL)) {
                                         fetch(element.content[el.property], {
                                             method: 'GET',
                                             headers: {
@@ -343,9 +343,6 @@ if (typeof GetURLParameter('formname') !== "undefined" && GetURLParameter('formn
                     }
 
                 });
-
-
-
         });
 }
 

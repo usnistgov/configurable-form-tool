@@ -54,7 +54,6 @@ function createFormJson(content) {
         "form": content.form,
         "onSubmitValid": function (values) {
             if (!!document.querySelector('input[type=file]')) {
-                //var file = document.querySelector('input[type=file]').files[0];
                 var data_form = new FormData();
                 files.forEach(item => {
                     var file = document.querySelector('input[name=' + item['key'] + ']').files[0];

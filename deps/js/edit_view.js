@@ -2,15 +2,12 @@
 * Function which  helps to split the value on every button(Edit, Delete, view) and send it to the url
 */
 function OpenBtnPage(id) {
-
     if (typeof id !== "undefined" && id !== null) {
         var result = id.split("_");
-
         window.location.replace("index.html?id=" + result[1] + "&mode=" + result[0] + "&type=" + result[2] + "&formname=" + result[3]);
     }
 
 }
-
 /*
    * This part of the code retrieve values in the url and help to do one get request to create a form with its schema
    * and defaut value if the form is an edit mode. With the values getting in the url, a put method is requested to edit an form. 
@@ -24,8 +21,6 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
     var wrapperForm = document.getElementById("contentTab");
     var payloadWrapper = document.getElementById("displayPlayload");
     var header_name = decodeURIComponent(GetURLParameter('formname'));
-
-    var payloadHTML = "";
     var myHTML = "";
     var urlParameter = GetURLParameter('mode');
     getData("/objects/?query=type:" + GetURLParameter('type') + " AND /id" + GetURLParameter('id'))
@@ -34,7 +29,8 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
             if (!!datas) {
                 if (datas.results[0].payloads) {
                     datas.results[0].payloads.forEach(elt => {
-                        fetch(CORDRA_HTTPS_URL + '/objects/' + datas.results[0].content['@id'] + '?' + new URLSearchParams({ payload: 'upload', disposition: 'attachment' }).toString(), {
+                        value_fetch = CORDRA_HTTPS_URL + '/objects/' + datas.results[0].content['@id'] + '?' + new URLSearchParams({ payload: elt["name"], disposition: 'attachment' }).toString();
+                        fetch(value_fetch, {
                             method: 'GET',
                             headers: {
                                 'Authorization': 'Bearer ' + authdata['token'],
@@ -43,8 +39,6 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                             .then(Blod => readResponseAsBlob(Blod))
                             .then(value => showImage(value, elt.filename))
                             .catch(error => logError(error));
-
-                        payloadHTML += "<a href=" + CORDRA_HTTPS_URL + "/objects/" + datas.results[0].content['@id'] + "?payload=upload download=" + CORDRA_HTTPS_URL + "/objects/" + datas.results[0].content['@id'] + "?payload=upload >" + elt.filename + "</a>";
                     });
                 }
 
@@ -76,14 +70,12 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                                             });
                                             formatValues.enum = selectValues;
                                             formatValues.titleMap = values;
-
                                             element.content.form.forEach(item => {
                                                 if (item.cordra) {
                                                     item.titleMap = values;
                                                     element.content.schema[item.key].enum = selectValues;
                                                 }
                                             });
-                                            
                                             modifiedForm(element.content, datas);
                                         });
 
@@ -198,8 +190,6 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
 
                                     });
                                 }
-
-
                             });
                             var form = document.getElementById(datas.results[0].content['formAlternateName']);
                             var elements = form.elements;
@@ -248,7 +238,6 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                                                 && typeof acl_datas.writers !== "undefined" && acl_datas.writers !== null) {
                                                 data.readers = data.readers.concat(acl_datas.readers);
                                                 data.writers = data.writers.concat(acl_datas.writers);
-
                                             }
                                             putData('/acls/' + recipient, data).then(respons => {
                                                 if (respons.status == 200) {
@@ -270,11 +259,7 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                         dropdown(recipient);
 
                     });
-
-
-
                 } else if (GetURLParameter('mode') === "delete") {
-
                     deleteData('/objects/' + GetURLParameter('id'))
                         .then(response => {
                             if (response.status == 200) {
@@ -285,11 +270,7 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                             }
                         });
                 }
-
-                //payloadWrapper.innerHTML = payloadHTML;
             }
-
-
         });
 
 }
@@ -334,6 +315,7 @@ function showImage(responseAsBlob, filename) {
     a.href = imgUrl;
     a.download = filename;
     a.title = filename;
+    a.style.cssText = "margin: 10px";
     const clickHandler = () => {
         setTimeout(() => {
             URL.revokeObjectURL(imgUrl);
