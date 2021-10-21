@@ -285,7 +285,7 @@ function showImage_tb(responseAsBlob, filename,name) {
         var imgUrl = URL.createObjectURL(responseAsBlob);
         var link = document.createTextNode(filename);
         const a = document.createElement('a');
-        imgElem.style.cssText = "width:100px;height:100px;";
+        imgElem.style.cssText = "height:100px;";
         imgElem.src = imgUrl;
         a.appendChild(imgElem);
         a.href = imgUrl;
@@ -365,7 +365,7 @@ function modifiedForm(content, datas) {
                 fetch(CORDRA_HTTPS_URL + '/objects/' + datas.results[0].content['@id'], {
                     method: 'PUT',
                     headers: {
-                        'Authorization': 'Bearer ' + authdata['token'],
+                        'Authorization': 'Bearer ' + authdata['token']
                     },
                     body: data_form
                 }).then(r => {

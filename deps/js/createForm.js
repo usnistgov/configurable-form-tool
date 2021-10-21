@@ -67,12 +67,10 @@ function createFormJson(content) {
                     
                 });
                 data_form.append('content', JSON.stringify(values));
-                //data_form.append('upload', file);
-                fetch(CORDRA_HTTPS_URL + '/objects/?type=' + content.cordraSchema, {
+               fetch(CORDRA_HTTPS_URL + '/objects/?type=' + content.cordraSchema, {
                     method: 'POST',
                     headers: {
-                        'Authorization': 'Bearer ' + authdata['token'],
-                        
+                        'Authorization': 'Bearer ' + authdata['token']
                     },
                     body: data_form
                 }).then(response => response.json())
