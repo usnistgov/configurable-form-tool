@@ -44,7 +44,7 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
 
                 if (urlParameter === "edit") {
                     //edit mode is where the user can edit a form
-                    myHTML += "<h1 class='page-header'>" + header_name.charAt(0).toUpperCase() + header_name.slice(1) + "</h1>";
+                    myHTML += "<h1 class='h2'>" + header_name.charAt(0).toUpperCase() + header_name.slice(1) + "</h1>";
                     myHTML += "<form id=" + datas.results[0].content['formAlternateName'] + "> </form>";
                     wrapperForm.innerHTML = myHTML;
                     getData("/objects/?query=jsonform AND /alternateName:" + datas.results[0].content['formAlternateName'])
@@ -86,52 +86,54 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                             });
                         });
                 } else if (GetURLParameter('mode') === "view") {
-
-                    // retrieving image https://sandbox.materialhub.org/objects/prefix/4fa85d7e562fcd1d251a?payload=filename
-                    // View mode is where all values are available in certain format
-                    //wrapperForm.appendChild(prettyPrint(datas.results));
                     localStorage.setItem("message", "");
-                    var page_name = "<h1 class='page-header'>" + header_name.charAt(0).toUpperCase() + header_name.slice(1);
-                    page_name += "<span class='page-header' style='float: right; margin-left: 10px;margin-right: 20px;'><button type='button' class='btn btn-primary' onclick=OpenBtnPage('edit_" + GetURLParameter('id') + "_" + GetURLParameter('type') + "_" + GetURLParameter('formname') + "')>"
-                        + "<span class='glyphicon glyphicon-pencil'></span></button><button type='button' class='btn btn-danger' data-toggle='modal' data-target='#delete" + GetURLParameter('id').split("/")[1] + "'>"
-                        + "<span class='glyphicon glyphicon-remove'></span></button><button type='button' class='btn btn-primary' data-toggle='modal' data-id='" + GetURLParameter('id') + "_" + datas.results[0].metadata["createdBy"] + "' data-target='#shareModal'>"
-                        + "<i class='fas fa-share-alt'></i></button></h1>";
-                    page_name += "<div class='modal fade' id='delete" + GetURLParameter('id').split("/")[1] + "' tabindex='-1' role='dialog' aria-labelledby='myModalLabel'>"
+                    var page_name = "<h1 class='h2'>" + header_name.charAt(0).toUpperCase() + header_name.slice(1) + "</h1>";
+                    page_name += "<div class='btn-toolbar'><div class='btn-group me-3'><button type='button' class='btn btn-outline-primary' onclick=OpenBtnPage('edit_" + GetURLParameter('id') + "_" + GetURLParameter('type') + "_" + GetURLParameter('formname') + "')>"
+                        + "<i class='bi bi-pencil-square'></i></button>";
+                    page_name += "<button type='button' class='btn  btn-outline-danger' data-bs-toggle='modal' data-bs-target='#delete" + GetURLParameter('id').split("/")[1] + "'>"
+                        + "<i class='bi bi-x-square'></i></button>";
+                    page_name += "<div class='modal fade' id='delete" + GetURLParameter('id').split("/")[1] + "' tabindex='-1'  aria-labelledby='myModalLabel' aria-hidden='true'>"
                         + "<div class='modal-dialog modal-sm' role='document'>"
                         + " <div class='modal-content'>"
                         + "<div class='modal-body'>"
                         + "Do you want to delete : <strong>" + GetURLParameter('id') + "</strong> ?"
                         + "</div>"
                         + "<div class='modal-footer'>"
-                        + "<button type='button' class='btn btn-default' data-dismiss='modal'>No</button>"
+                        + "<button type='button' class='btn btn-default' data-bs-dismiss='modal'>No</button>"
                         + "<button type='button' class='btn btn-primary' onclick=OpenBtnPage('delete_" + GetURLParameter('id') + "_" + GetURLParameter('type') + "_" + GetURLParameter('formname') + "')>Yes</button>"
                         + "</div>"
                         + "</div>"
                         + "</div>"
-                        + "</div>";
-                    page_name += "<div class='modal fade' id='shareModal' role='dialog'  tabindex='-1'  >"
+                        + "</div>"
+                        + "<button type='button' class='btn btn-outline-primary' data-bs-toggle='modal' data-id='" + GetURLParameter('id') + "_" + datas.results[0].metadata["createdBy"] + "' data-bs-target='#shareModal' > "
+                        + "<i class='fas fa-share-alt'></i></button>";
+                    page_name += "<div class='modal fade' id='shareModal'   tabindex='-1' >"
                         + "<div class='modal-dialog modal-lg' role='document'>"
-                        + " <div class='modal-content'>"
-                        + "  <div class='modal-header'>"
-                        + "<button type='button' class='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>&times;</span></button>"
+                        + "<div class='modal-content'>"
+                        + "<div class='modal-header'>"
                         + "<h4 class='modal-title' id='myModalLabel'>Share</h4>"
+                        + "<button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>"
                         + "</div>"
                         + "<div class='modal-body'>"
-                        + "<form id='acl_user' class='form-inline'>"
-                        + "<div class='form-group' id='select_drop'>"
+                        + "<form id='acl_user'>"
+                        + "<div class='row g-3'>"
+                        + "<div class='col' id='select_drop'>"
                         + "</div>"
-                        + "<div class='checkbox'> <label>"
-                        + "<input type='checkbox' id='read' class='form-check-input' name='read' value='read' required>Can Read"
-                        + "</label></div>"
-                        + "<div class='checkbox'> <label>"
-                        + "<input type='checkbox' id='write' class='form-check-input'  name='write' value='write' required>Can write"
-                        + "</label></div>"
-                        + "<button  type='submit' id='submit_btn' class='btn btn-default'>Add</button>"
+                        + "<div class='col form-check'>"
+                        + "<input type='checkbox' id='read' class='form-check-input' name='read' value='read' required>"
+                        + "<label for ='read' class='form-check-label'>Can Read</label> </div>"
+                        + "<div class='col form-check'>"
+                        + "<input type='checkbox' id='write' class='form-check-input'  name='write' value='write' required>"
+                        + "<label for='write' class='form-check-label'>Can write</label></div>"
+                        + "<button  type='submit' id='submit_btn' class='btn btn-primary col'>Add</button>"
+                        + "</div>"
                         + "</form>"
                         + "<hr>"
                         + "<div id='table_user'></div>"
                         + "</div>"
                         + "<div class='modal-footer'>"
+                        + "</div>"
+                        + "</div>"
                         + "</div>"
                         + "</div>"
                         + "</div>"
@@ -248,7 +250,6 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                                                     dropdown(recipient);
                                                 }
                                             });
-
                                         });
                                 }
 
@@ -278,7 +279,7 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
 function readResponseAsBlob(response) {
     return response.blob();
 }
-function showImage_tb(responseAsBlob, filename,name) {
+function showImage_tb(responseAsBlob, filename, name) {
     if (responseAsBlob.type && responseAsBlob.type.includes("image")) {
         var displayPlayload = document.getElementById(filename);
         var imgElem = document.createElement('img');
@@ -289,8 +290,8 @@ function showImage_tb(responseAsBlob, filename,name) {
         imgElem.src = imgUrl;
         a.appendChild(imgElem);
         a.href = imgUrl;
-        a.download = name+"."+responseAsBlob['type'].split('/')[1];
-        a.title = name+"."+responseAsBlob['type'].split('/')[1];
+        a.download = name + "." + responseAsBlob['type'].split('/')[1];
+        a.title = name + "." + responseAsBlob['type'].split('/')[1];
         const clickHandler = () => {
             setTimeout(() => {
                 URL.revokeObjectURL(imgUrl);
@@ -326,7 +327,7 @@ function showImage(responseAsBlob, filename) {
     container.appendChild(a);
     imgElem.src = imgUrl;
     if (responseAsBlob.type && responseAsBlob.type.includes("image")) {
-        if(displayPlayload) displayPlayload.appendChild(imgElem);
+        if (displayPlayload) displayPlayload.appendChild(imgElem);
     }
 }
 
@@ -348,7 +349,7 @@ function modifiedForm(content, datas) {
         "form": content.form,
         "value": datas.results[0].content,
         "onSubmitValid": function (values) {
-            if (!!document.querySelector('input[type=file]')){
+            if (!!document.querySelector('input[type=file]')) {
                 var data_form = new FormData();
                 files.forEach(item => {
                     var file = document.querySelector('input[name=' + item['key'] + ']').files[0];
@@ -359,7 +360,7 @@ function modifiedForm(content, datas) {
                     } else {
                         values[item['key']] = datas.results[0].content[item['key']];
                     }
-                   
+
                 });
                 data_form.append('content', JSON.stringify(values));
                 fetch(CORDRA_HTTPS_URL + '/objects/' + datas.results[0].content['@id'], {
@@ -390,3 +391,7 @@ function modifiedForm(content, datas) {
         }
     });
 }
+
+
+
+
