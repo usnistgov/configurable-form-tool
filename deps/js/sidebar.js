@@ -32,7 +32,7 @@ getData("/objects/?query=type:Form"+filter)
     var primary_select="";
     var wrapper = document.getElementById("tab");
     var primaryWrapper = document.getElementById("primary_select");
-    primary_select+="<select id='primary_key' class='form-control select_class' onchange=primaryFunction()> ";
+    primary_select+="<select id='primary_key' class='form-select select_class' onchange=primaryFunction()> ";
     primary_select+="<option value=''selected='selected'>Primary Filter</option>";
     data.results.forEach(element => {
         if (!!element.content.cordraSchema ) {
@@ -60,7 +60,7 @@ getData("/objects/?query=type:Form"+filter)
     });
     for (let item of primary.values()){
         if(item===primaryV || item===primary_S){ 
-            primary_select+="<option value='"+item+"' selected='selected'>"+item+"</option>";
+            primary_select+="<option value='"+item+"' selected>"+item+"</option>";
         }
         else{
             primary_select+="<option value='"+item+"'>"+item+"</option>";
@@ -71,10 +71,11 @@ getData("/objects/?query=type:Form"+filter)
 
     var myHTML="";
     for (const prop in obj) { 
-        myHTML+="<li>"+prop+"</li><ul class='nav'>";
+        myHTML += "<h5 class='sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted'>" +
+            "<span>"+prop + "</span></h5><ul class='nav flex-column'>";
         obj[prop].forEach(elmt=>{
             data=elmt.split("/");
-            myHTML+="<li><a href='#' onclick=openContentElmt('" + encodeURIComponent(elmt)+ "') >" + data[0] + "</a></li>";
+            myHTML+="<li class='nav-item'><a class='nav-link' href='#' onclick=openContentElmt('" + encodeURIComponent(elmt)+ "') >" + data[0] + "</a></li>";
         });
             
         myHTML+="</ul>";
@@ -105,8 +106,8 @@ function primaryFunction(){
     var secondary = new Set();
     var secondary_select="";
     var secondaryWrapper = document.getElementById("secondary_select");
-    secondary_select+="<select id='secondary_key' class='form-control select_class' onchange=secondaryFunction('"+x+"')> ";
-    secondary_select+="<option value='' selected='selected'>Secondary Filter</option>";
+    secondary_select+="<select id='secondary_key' class='form-select select_class' onchange=secondaryFunction('"+x+"')> ";
+    secondary_select+="<option value='' selected>Secondary Filter</option>";
     getData("/objects/?query=jsonform&filter=['/content/filterPrimary','/content/filterSecondary']")
     .then(response => response.json())
     .then(data => { 
@@ -124,7 +125,7 @@ function primaryFunction(){
     
     for (let item of secondary.values()){
         if(item === secondary_S){
-            secondary_select+="<option value='"+item+"' selected='selected'>"+item+"</option>";  
+            secondary_select+="<option value='"+item+"' selected>"+item+"</option>";  
         }else{
             secondary_select+="<option value='"+item+"'>"+item+"</option>";
         }
