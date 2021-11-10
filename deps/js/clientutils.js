@@ -2,8 +2,9 @@
 
 // TODO this belongs somewhere not here
  //const CORDRA_HTTPS_URL = 'https://localhost:8443'
-const CORDRA_HTTPS_URL = "https://sandbox.materialhub.org";
+//const CORDRA_HTTPS_URL = main_url.CORDRA_HTTPS_URL;
 /// Check if a string is nonempty
+console.log(CORDRA_HTTPS_URL);
 function nonEmpty(str) {
 	// TODO less hacky
 	return !!str;

@@ -7,11 +7,19 @@ function OpenBtnPage(url_values) {
         window.location.replace("index.html?mode=" + result[0] + "&form=" + result[2] + "&id=" + result[1]);
     }
 }
+function OpenBtnPage_Create(url_values) {
+    if (typeof url_values !== "undefined" && url_values !== null) {
+        var result = url_values.split("_");
+        window.location.replace("index.html?mode=" + result[0] + "&form="+ result[1]);
+    }
+}
 /*
    * This part of the code retrieve values in the url and help to do one get request to create a form with its schema
    * and defaut value if the form is an edit mode. With the values getting in the url, a put method is requested to edit an form. 
    * Even delete a table values is done within this script below 
    */
+
+
 if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== null &&
     typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !== null &&
     typeof GetURLParameter('form') !== "undefined" && GetURLParameter('form') !== null ) {
@@ -44,7 +52,7 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                         }
                         if (urlParameter === "edit") {
                             //edit mode is where the user can edit a form
-                            myHTML += "<h1 class='h2'>" + form_val.name.charAt(0).toUpperCase() + form_val.name.slice(1) + "</h1>";
+                            var page_name = "<h1 class='h2'>" + form_val.name.charAt(0).toUpperCase() + form_val.name.slice(1) + "</h1>";
                             myHTML += "<form id=" + datas.results[0].content['formAlternateName'] + "> </form>";
                             wrapperForm.innerHTML = myHTML;
                             getData("/objects/?query=" + form_val.cordraSchema + " AND /alternateName:" + datas.results[0].content['formAlternateName'])
@@ -82,7 +90,7 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                                         } else {
                                             modifiedForm(element.content, datas);
                                         }
-
+                                        document.getElementById("page-header").innerHTML = page_name;
                                     });
                                 });
                         } else if (urlParameter === "view") {
@@ -154,7 +162,6 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                                             }
                                         });
                                         if (queries.length > 0) {
-                                            console.log(queries[0].cordra.query);
                                             getData("/objects/?query=" + queries[0].cordra.query + "&filter=['/content/@id','/content/name']")
                                                 .then(response => response.json())
                                                 .then(data => {

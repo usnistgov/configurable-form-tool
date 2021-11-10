@@ -1,6 +1,18 @@
 /*
    * Function which helps to create Form
    */
+if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !== null && GetURLParameter('mode') === "create" &&
+    typeof GetURLParameter('form') !== "undefined" && GetURLParameter('form') !== null) {
+    var page_name = "";
+    getData("/objects/" + GetURLParameter('form'))
+        .then(response => response.json())
+        .then(form_val => {
+            page_name = "<h1 class='h1'>" + form_val.name.charAt(0).toUpperCase() + form_val.name.slice(1) + "</h1>";
+            var formname = form_val.alternateName + "/" + form_val.cordraSchema;
+            createForm(formname);
+            document.getElementById("page-header").innerHTML = page_name;
+        });
+}
 function createForm(formname) {
     localStorage.setItem("message", "");
     var html = "";
@@ -58,7 +70,6 @@ function createFormJson(content) {
                 var data_form = new FormData();
                 files.forEach(item => {
                     var file = document.querySelector('input[name=' + item['key'] + ']').files[0];
-                    console.log(file);
                     if (file) {
                         data_form.append(item['key'], file);
                         values[item['key']] = new URLSearchParams({ payload: item['key'], disposition: 'attachment'}).toString();
@@ -76,7 +87,6 @@ function createFormJson(content) {
                     body: data_form
                 }).then(response => response.json())
                 .then(r => {
-                    console.log(r);
                     if (response.status == 200) {
                         let data = {
                             "readers": [sessionStorage.getItem("userId")],
@@ -88,7 +98,7 @@ function createFormJson(content) {
                                     new URLSearchParams({ payload: item['key'], disposition: 'attachment' }).toString();
                             }
                         });
-                        putData('/objects/' + r['@id'], values).then(resp => console.log(resp.status));
+                        putData('/objects/' + r['@id'], values).then(resp => resp.status);
                         putData('/acls/' + r['@id'],data).then(response => {
                             if (response.status == 200) {
                                 document.getElementById("msg").style.display = "block";

@@ -34,7 +34,7 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                 .then(response => response.json())
                 .then(data => {
                     page_name = "<h1 class='h1'>" + form_val.name.charAt(0).toUpperCase() + form_val.name.slice(1) + "</h1>";
-                    page_name += "<div class='btn-toolbar mb-2 mb-md-0'><button class='btn btn-primary' onclick=createForm('" + form_val.alternateName+"/"+form_val.cordraSchema+ "')> New " + form_val.name + " </button></div>";
+                    page_name += "<div class='btn-toolbar mb-2 mb-md-0'><button class='btn btn-primary' onclick=OpenBtnPage_Create('create_" +id_form + "')> New " + form_val.name + " </button></div>";
                     // Creation of dynamic table with the variable name tableTest
                     var tableTest = " <div id='" + form_val.alternateName + "' class='table-responsive' >"
                         + " <div style='overflow-x:auto;'><table  id='table_id' class='table table-striped table-bordered table-hover'>"
