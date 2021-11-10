@@ -15,339 +15,342 @@ function GetURLParameter(sParam) {
 }
 function openContentElmt(content) {
     if (typeof content !== "undefined" && content !== null) {
-        content = decodeURIComponent(content).split("/");
-        localStorage.setItem("redirect", "index.html?formname=" + content[0] + "&altname=" + content[1] + "&schema=" + content[2]);
+        localStorage.setItem("redirect", "index.html?mode=list&form=" +content);
         localStorage.setItem("message", "");
-        window.location.replace("index.html?formname=" + content[0] + "&altname=" + content[1] + "&schema=" + content[2]);
+        window.location.replace("index.html?mode=list&form=" +content);
     }
 }
 
-if (typeof GetURLParameter('formname') !== "undefined" && GetURLParameter('formname') !== null &&
-    typeof GetURLParameter('altname') !== "undefined" && GetURLParameter('altname') !== null &&
-    typeof GetURLParameter('schema') !== "undefined" && GetURLParameter('schema') !== null
-) {
+if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !== null && GetURLParameter('mode') ==="list" &&
+    typeof GetURLParameter('form') !== "undefined" && GetURLParameter('form') !== null ) {
 
     var wrapperTable = document.getElementById("contentTab");
     var page_name = "";
-    var urlValue = (decodeURIComponent(GetURLParameter('formname')) + "/" + GetURLParameter('altname') + "/" + GetURLParameter('schema')).split("/");
-    getData("/objects/?query=type:" + urlValue[2] + " AND /formAlternateName:" + urlValue[1])
-    .then(response => response.json())
-    .then(data => {
-        page_name = "<h1 class='h1'>" + urlValue[0].charAt(0).toUpperCase() + urlValue[0].slice(1) + "</h1>";
-        page_name += "<div class='btn-toolbar mb-2 mb-md-0'><button class='btn btn-primary' onclick=createForm('" + urlValue[1] + "')> New " + urlValue[0] + " </button></div>";
-        var tableTest = " <div id='" + urlValue[1] + "' class='table-responsive' >"
-            + " <div style='overflow-x:auto;'><table  id='table_id' class='table table-striped table-bordered table-hover'>"
-            + "<thead>"
-            + "<tr>";
-        var tableHTML = " <div id='" + urlValue[1] + "' class='table-responsive' >"
-            + " <div style='overflow-x:auto;'><table  id='table_id' class='table table-striped table-bordered table-hover'>"
-            + "<thead>"
-            + "<tr>"
-            + "<th scope='col'>Persistent Identifier</th>"
-            + "<th scope='col'>Name</th>"
-            + "<th></th>"
-            + " </tr>"
-            + " </thead>"
-            + "<tbody>";
-        var tableElmt = "";
-        getData("/objects/?query=jsonform AND /alternateName:" + urlValue[1])
+    var id_form = decodeURIComponent(GetURLParameter('form'));
+    getData("/objects/" + id_form)
         .then(response => response.json())
-        .then(dataTableColumns => {
-            if (dataTableColumns.results[0].content.tableColumns) {
-                dataTableColumns.results[0].content.tableColumns.forEach(el => {
-                    tableTest += "<th scope='col'>" + el.title + "</th>";
-                });
-                tableTest += "</tr></thead><tbody><tr>";
-                data.results.forEach(element => {
-                    dataTableColumns.results[0].content.tableColumns.forEach(el => {
-                        if (el.type === "string") {
-                            tableTest += "<td scope='row'> " + element.content[el.property] + "</td>";
-                        } else if (el.type === "hyperlink") {
-                            tableTest += "<td scope='row'> <a style='color: #337ab7 !important;' href=" + element.content[el.property] + " target='_blank' rel='noopener noreferrer'>" + element.content[el.property] + "</a></td>";
-                        } else if (el.type === "image") {
-                            tableTest += "<td scope='row' id='" + element.content[el.property] + "'> </td>";
-                            if (element.content[el.property] != "" && element.content[el.property].includes(CORDRA_HTTPS_URL)) {
-                                fetch(element.content[el.property], {
-                                    method: 'GET',
-                                    headers: {
-                                        'Authorization': 'Bearer ' + authdata['token'],
+        .then(form_val => {
+            getData("/objects/?query=type:" + form_val.cordraSchema + " AND /formAlternateName:" + form_val.alternateName)
+                .then(response => response.json())
+                .then(data => {
+                    page_name = "<h1 class='h1'>" + form_val.name.charAt(0).toUpperCase() + form_val.name.slice(1) + "</h1>";
+                    page_name += "<div class='btn-toolbar mb-2 mb-md-0'><button class='btn btn-primary' onclick=createForm('" + form_val.alternateName+"/"+form_val.cordraSchema+ "')> New " + form_val.name + " </button></div>";
+                    // Creation of dynamic table with the variable name tableTest
+                    var tableTest = " <div id='" + form_val.alternateName + "' class='table-responsive' >"
+                        + " <div style='overflow-x:auto;'><table  id='table_id' class='table table-striped table-bordered table-hover'>"
+                        + "<thead>"
+                        + "<tr>";
+                    // Creation of not dynamic table with the variable name tableTest
+                    var tableHTML = " <div id='" + form_val.alternateName + "' class='table-responsive' >"
+                        + " <div style='overflow-x:auto;'><table  id='table_id' class='table table-striped table-bordered table-hover'>"
+                        + "<thead>"
+                        + "<tr>"
+                        + "<th scope='col'>Persistent Identifier</th>"
+                        + "<th scope='col'>Name</th>"
+                        + "<th></th>"
+                        + " </tr>"
+                        + " </thead>"
+                        + "<tbody>";
+                    var tableElmt = "";
+                    getData("/objects/?query=" + form_val.cordraSchema + " AND /alternateName:" + form_val.alternateName)
+                        .then(response => response.json())
+                        .then(dataTableColumns => {
+                            if (dataTableColumns.results[0].content.tableColumns) {
+                                dataTableColumns.results[0].content.tableColumns.forEach(el => {
+                                    tableTest += "<th scope='col'>" + el.title + "</th>";
+                                });
+                                tableTest += "</tr></thead><tbody><tr>";
+                                data.results.forEach(element => {
+                                    dataTableColumns.results[0].content.tableColumns.forEach(el => {
+                                        if (el.type === "string") {
+                                            tableTest += "<td scope='row'> " + element.content[el.property] + "</td>";
+                                        } else if (el.type === "hyperlink") {
+                                            tableTest += "<td scope='row'> <a style='color: #337ab7 !important;' href=" + element.content[el.property] + " target='_blank' rel='noopener noreferrer'>" + element.content[el.property] + "</a></td>";
+                                        } else if (el.type === "image") {
+                                            tableTest += "<td scope='row' id='" + element.content[el.property] + "'> </td>";
+                                            if (element.content[el.property] != "" && element.content[el.property].includes(CORDRA_HTTPS_URL)) {
+                                                fetch(element.content[el.property], {
+                                                    method: 'GET',
+                                                    headers: {
+                                                        'Authorization': 'Bearer ' + authdata['token'],
+                                                    }
+                                                }).then(response => validateResponse(response))
+                                                    .then(Blod => readResponseAsBlob(Blod))
+                                                    .then(value => showImage_tb(value, element.content[el.property], el.title))
+                                                    .catch(error => logError(error));
+                                            }
+
+                                        } else if (el.type === "action") {
+                                            if (!!element.content) {
+                                                tableElmt = element.content['@id'];
+                                                var id = tableElmt.split("/");
+                                                tableTest += "<td>";
+                                                tableTest += (!!element['id']) ? "<div class='btn-group' role='group' aria-label='Basic radio toggle button group'><button type='button' class='btn btn-primary' onclick=OpenBtnPage('edit_" + element.content['@id'] + "_"+ id_form + "')>"
+                                                    + "<i class='bi bi-pencil-square'></i></button>" : " ";
+                                                tableTest += (!!element['id']) ? "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#delete" + id[1] + "' >"
+                                                    + "<i class='bi bi-x-square'></i></button>"
+                                                    + "<div class='modal fade' id='delete" + id[1] + "' tabindex='-1' role='dialog' aria-labelledby='myModalLabel'>"
+                                                    + "<div class='modal-dialog modal-sm' role='document'>"
+                                                    + " <div class='modal-content'>"
+                                                    + "<div class='modal-body'>"
+                                                    + "Do you want to delete : <strong>" + element.content['@id'] + "</strong> ?"
+                                                    + "</div>"
+                                                    + "<div class='modal-footer'>"
+                                                    + "<button type='button' class='btn btn-default' data-bs-dismiss='modal'>No</button>"
+                                                    + "<button type='button' class='btn btn-primary' onclick=OpenBtnPage('delete_" + element.content['@id'] + "_" + id_form + "')>Yes</button>"
+                                                    + "</div>"
+                                                    + "</div>"
+                                                    + "</div>"
+                                                    + "</div>"
+                                                    : " ";
+                                                tableTest += (!!element['id']) ? "<button type='button' class='btn btn-info' onclick=OpenBtnPage('view_" + element.content['@id'] + "_" + id_form + "')>"
+                                                    + "<i class='bi bi-eye'></i></button>" : " ";
+                                                tableTest += (!!element['id']) ? "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-id='" + element.content['@id'] + "_" + element.metadata["createdBy"] + "' data-bs-target='#shareModal'>"
+                                                    + "<i class='fas fa-share-alt'></i></button>"
+                                                    + "<div class='modal fade' id='shareModal' role='dialog'  tabindex='-1'  >"
+                                                    + "<div class='modal-dialog modal-lg' role='document'>"
+                                                    + " <div class='modal-content'>"
+                                                    + "  <div class='modal-header'>"
+                                                    + "<h4 class='modal-title' id='myModalLabel'>Share</h4>"
+                                                    + "<button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>"
+                                                    + "</div>"
+                                                    + "<div class='modal-body'>"
+                                                    + "<form id='acl_user'>"
+                                                    + "<div class='row g-3'>"
+                                                    + "<div class='col' id='select_drop'>"
+                                                    + "</div>"
+                                                    + "<div class='col form-check'> "
+                                                    + "<input type='checkbox' id='read' class='form-check-input' name='read' value='read' required>"
+                                                    + "<label for ='read' class='form-check-label'>Can Read</label> </div>"
+                                                    + "<div class='col form-check'> "
+                                                    + "<input type='checkbox' id='write' class='form-check-input'  name='write' value='write' required>"
+                                                    + "<label for='write' class='form-check-label'>Can write</label></div>"
+                                                    + "<button  type='submit' id='submit_btn' class='btn btn-primary col'>Add</button>"
+                                                    + "</div>"
+                                                    + "</form>"
+                                                    + "<hr>"
+                                                    + "<div id='table_user'></div>"
+                                                    + "</div>"
+                                                    + "</div>"
+                                                    + "</div>"
+                                                    + "</div></div>"
+                                                    : " ";
+                                                tableTest += "</td>";
+                                            }
+                                        }
+
+                                    });
+                                    tableTest += "</tr>"
+                                });
+                                document.getElementById("page-header").innerHTML = page_name;
+                                tableTest += "</tbody></table></div></div>";
+                                if (!!tableTest) {
+                                    wrapperTable.innerHTML = tableTest;
+                                }
+                                else {
+                                    wrapperTable.innerHTML = "";
+                                }
+                                $('#table_id').DataTable();
+                                $('#shareModal').on('hidden.bs.modal', function (e) {
+                                    $('#acl_user')[0].reset();
+                                    location.reload();
+                                });
+                                $('#shareModal').on('show.bs.modal', function (event) {
+
+                                    var button = $(event.relatedTarget); // Button that triggered the modal
+                                    var split_values = button.data('id'); // Extract info from data-* attributes   
+                                    split_values = split_values.split("_");
+                                    var recipient = split_values[0];
+
+                                    var userIdCreateEntry = split_values[1];
+
+                                    $('#submit_btn').click(function (e) {
+                                        e.preventDefault();
+
+                                        var data = {
+                                            readers: [],
+                                            writers: []
+                                        };
+
+                                        if ($('#read').is(":checked")) {
+                                            data.readers = $('#drop').val();
+                                        }
+                                        if ($('#write').is(":checked")) {
+                                            data.writers = $('#drop').val();
+                                            data.writers = data.writers.filter(item => item !== "public");
+                                        }
+                                        if (data.readers === null || data.readers.length === 0) {
+                                            alert("The user must have a read access!!");
+                                        } else {
+                                            if (data.writers.length === 0 && data.readers.length === 0) {
+                                                alert("You must check at least one box");
+                                            } else {
+                                                getData("/acls/" + recipient).then(response => response.json())
+                                                    .then(acl_datas => {
+                                                        if (!!acl_datas && typeof acl_datas.readers !== "undefined" && acl_datas.readers !== null
+                                                            && typeof acl_datas.writers !== "undefined" && acl_datas.writers !== null) {
+                                                            data.readers = data.readers.concat(acl_datas.readers);
+                                                            data.writers = data.writers.concat(acl_datas.writers);
+                                                        }
+                                                        putData('/acls/' + recipient, data).then(respons => {
+                                                            if (respons.status == 200) {
+                                                                $('#acl_user')[0].reset();
+                                                                data = {};
+                                                                $('#drop').multiselect('refresh');
+                                                                loadTable(recipient, userIdCreateEntry);
+                                                                dropdown(recipient);
+                                                            }
+                                                        });
+
+                                                    });
+                                            }
+
+                                        }
+
+                                    });
+                                    loadTable(recipient, userIdCreateEntry);
+                                    dropdown(recipient);
+                                });
+                            } else {
+                                data.results.forEach(element => {
+                                    if (!!element.content) {
+                                        tableElmt = element.content['@id'];
+                                        var id = tableElmt.split("/");
+                                        tableHTML += "<tr>"
+                                        tableHTML += "<td scope='row'>" + element.content['@id'] + "</td>";
+                                        tableHTML += (!!element.content['name']) ? "<td>" + element.content['name'] + "</td>" : "<td></td>";
+                                        tableHTML += "<td>";
+                                        tableHTML += (!!element['id']) ? "<div class='btn-group' role='group' aria-label='Basic radio toggle button group'><button type='button' class='btn btn-primary' onclick=OpenBtnPage('edit_" + element.content['@id'] + "_"+ id_form + "')>"
+                                            + "<i class='bi bi-pencil-square'></i></button>" : " ";
+                                        tableHTML += (!!element['id']) ? "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#delete" + id[1] + "' >"
+                                            + "<i class='bi bi-x-square'></i></button>"
+                                            + "<div class='modal fade' id='delete" + id[1] + "' tabindex='-1' role='dialog' aria-labelledby='myModalLabel'>"
+                                            + "<div class='modal-dialog modal-sm' role='document'>"
+                                            + " <div class='modal-content'>"
+                                            + "<div class='modal-body'>"
+                                            + "Do you want to delete : <strong>" + element.content['name'] + "</strong> ?"
+                                            + "</div>"
+                                            + "<div class='modal-footer'>"
+                                            + "<button type='button' class='btn btn-default' data-bs-dismiss='modal'>No</button>"
+                                            + "<button type='button' class='btn btn-primary' onclick=OpenBtnPage('delete_" + element.content['@id'] + "_" + id_form + "')>Yes</button>"
+                                            + "</div>"
+                                            + "</div>"
+                                            + "</div>"
+                                            + "</div>"
+                                            : " ";
+                                        tableHTML += (!!element['id']) ? "<button type='button' class='btn btn-info' onclick=OpenBtnPage('view_" + element.content['@id'] + "_" + id_form + "')>"
+                                            + "<i class='bi bi-eye'></i></button>" : " ";
+                                        tableHTML += (!!element['id']) ? "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-id='" + element.content['@id'] + "_" + element.metadata["createdBy"] + "' data-bs-target='#shareModal'>"
+                                            + "<i class='fas fa-share-alt'></i></button>"
+                                            + "<div class='modal fade' id='shareModal' role='dialog'  tabindex='-1'  >"
+                                            + "<div class='modal-dialog modal-lg' role='document'>"
+                                            + " <div class='modal-content'>"
+                                            + "  <div class='modal-header'>"
+                                            + "<h4 class='modal-title' id='myModalLabel'>Share</h4>"
+                                            + "<button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>"
+                                            + "</div>"
+                                            + "<div class='modal-body'>"
+                                            + "<form id='acl_user'>"
+                                            + "<div class='row g-3'>"
+                                            + "<div class='col' id='select_drop'>"
+                                            + "</div>"
+                                            + "<div class='col form-check'> "
+                                            + "<input type='checkbox' id='read' class='form-check-input' name='read' value='read' required>"
+                                            + "<label for ='read' class='form-check-label'>Can Read</label> </div>"
+                                            + "<div class='col form-check'> "
+                                            + "<input type='checkbox' id='write' class='form-check-input'  name='write' value='write' required>"
+                                            + "<label for='write' class='form-check-label'>Can write</label></div>"
+                                            + "<button  type='submit' id='submit_btn' class='btn btn-primary col'>Add</button>"
+                                            + "</div>"
+                                            + "</form>"
+                                            + "<hr>"
+                                            + "<div id='table_user'></div>"
+                                            + "</div>"
+                                            + "</div>"
+                                            + "</div>"
+                                            + "</div></div>"
+                                            : " ";
+                                        tableHTML += "</td></tr>";
                                     }
-                                }).then(response => validateResponse(response))
-                                    .then(Blod => readResponseAsBlob(Blod))
-                                    .then(value => showImage_tb(value, element.content[el.property], el.title))
-                                    .catch(error => logError(error));
-                            }
+                                });
+                                document.getElementById("page-header").innerHTML = page_name;
+                                tableHTML += "</tbody></table></div></div>";
+                                if (!!tableElmt) {
+                                    wrapperTable.innerHTML = tableHTML;
+                                }
+                                else {
+                                    wrapperTable.innerHTML = "";
+                                }
+                                $('#table_id').DataTable();
+                                $('#shareModal').on('hidden.bs.modal', function (e) {
+                                    $('#acl_user')[0].reset();
+                                    location.reload();
+                                });
+                                $('#shareModal').on('show.bs.modal', function (event) {
 
-                        } else if (el.type === "action") {
-                            if (!!element.content) {
-                                tableElmt = element.content['@id'];
-                                var id = tableElmt.split("/");
-                                tableTest += "<td>";
-                                tableTest += (!!element['id']) ? "<div class='btn-group' role='group' aria-label='Basic radio toggle button group'><button type='button' class='btn btn-primary' onclick=OpenBtnPage('edit_" + element.content['@id'] + "_" + element['type'] + "_" + encodeURIComponent(urlValue[0]) + "')>"
-                                    + "<i class='bi bi-pencil-square'></i></button>" : " ";
-                                tableTest += (!!element['id']) ? "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#delete" + id[1] + "' >"
-                                    + "<i class='bi bi-x-square'></i></button>"
-                                    + "<div class='modal fade' id='delete" + id[1] + "' tabindex='-1' role='dialog' aria-labelledby='myModalLabel'>"
-                                    + "<div class='modal-dialog modal-sm' role='document'>"
-                                    + " <div class='modal-content'>"
-                                    + "<div class='modal-body'>"
-                                    + "Do you want to delete : <strong>" + element.content['@id'] + "</strong> ?"
-                                    + "</div>"
-                                    + "<div class='modal-footer'>"
-                                    + "<button type='button' class='btn btn-default' data-bs-dismiss='modal'>No</button>"
-                                    + "<button type='button' class='btn btn-primary' onclick=OpenBtnPage('delete_" + element.content['@id'] + "_" + element['type'] + "_" + encodeURIComponent(urlValue[0]) + "')>Yes</button>"
-                                    + "</div>"
-                                    + "</div>"
-                                    + "</div>"
-                                    + "</div>"
-                                    : " ";
-                                tableTest += (!!element['id']) ? "<button type='button' class='btn btn-info' onclick=OpenBtnPage('view_" + element.content['@id'] + "_" + element['type'] + "_" + encodeURIComponent(urlValue[0]) + "')>"
-                                    + "<i class='bi bi-eye'></i></button>" : " ";
-                                tableTest += (!!element['id']) ? "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-id='" + element.content['@id'] + "_" + element.metadata["createdBy"] + "' data-bs-target='#shareModal'>"
-                                    + "<i class='fas fa-share-alt'></i></button>"
-                                    + "<div class='modal fade' id='shareModal' role='dialog'  tabindex='-1'  >"
-                                    + "<div class='modal-dialog modal-lg' role='document'>"
-                                    + " <div class='modal-content'>"
-                                    + "  <div class='modal-header'>"
-                                    + "<h4 class='modal-title' id='myModalLabel'>Share</h4>"
-                                    + "<button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>"
-                                    + "</div>"
-                                    + "<div class='modal-body'>"
-                                    + "<form id='acl_user'>"
-                                    + "<div class='row g-3'>"
-                                    + "<div class='col' id='select_drop'>"
-                                    + "</div>"
-                                    + "<div class='col form-check'> "
-                                    + "<input type='checkbox' id='read' class='form-check-input' name='read' value='read' required>"
-                                    + "<label for ='read' class='form-check-label'>Can Read</label> </div>"
-                                    + "<div class='col form-check'> "
-                                    + "<input type='checkbox' id='write' class='form-check-input'  name='write' value='write' required>"
-                                    + "<label for='write' class='form-check-label'>Can write</label></div>"
-                                    + "<button  type='submit' id='submit_btn' class='btn btn-primary col'>Add</button>"
-                                    + "</div>"
-                                    + "</form>"
-                                    + "<hr>"
-                                    + "<div id='table_user'></div>"
-                                    + "</div>"
-                                    + "</div>"
-                                    + "</div>"
-                                    + "</div></div>"
-                                    : " ";
-                                tableTest += "</td>";
-                            }
-                        }
+                                    var button = $(event.relatedTarget); // Button that triggered the modal
+                                    var split_values = button.data('id'); // Extract info from data-* attributes   
+                                    split_values = split_values.split("_");
+                                    var recipient = split_values[0];
 
-                    });
-                    tableTest += "</tr>"
-                });
-                document.getElementById("page-header").innerHTML = page_name;
-                tableTest += "</tbody></table></div></div>";
-                if (!!tableTest) {
-                    wrapperTable.innerHTML = tableTest;
-                }
-                else {
-                    wrapperTable.innerHTML = "";
-                }
-                $('#table_id').DataTable();
-                $('#shareModal').on('hidden.bs.modal', function (e) {
-                    $('#acl_user')[0].reset();
-                    location.reload();
-                });
-                $('#shareModal').on('show.bs.modal', function (event) {
+                                    var userIdCreateEntry = split_values[1];
 
-                    var button = $(event.relatedTarget); // Button that triggered the modal
-                    var split_values = button.data('id'); // Extract info from data-* attributes   
-                    split_values = split_values.split("_");
-                    var recipient = split_values[0];
+                                    $('#submit_btn').click(function (e) {
+                                        e.preventDefault();
 
-                    var userIdCreateEntry = split_values[1];
+                                        var data = {
+                                            readers: [],
+                                            writers: []
+                                        };
 
-                    $('#submit_btn').click(function (e) {
-                        e.preventDefault();
-
-                        var data = {
-                            readers: [],
-                            writers: []
-                        };
-
-                        if ($('#read').is(":checked")) {
-                            data.readers = $('#drop').val();
-                        }
-                        if ($('#write').is(":checked")) {
-                            data.writers = $('#drop').val();
-                            data.writers = data.writers.filter(item => item !== "public");
-                        }
-                        if (data.readers === null || data.readers.length === 0) {
-                            alert("The user must have a read access!!");
-                        } else {
-                            if (data.writers.length === 0 && data.readers.length === 0) {
-                                alert("You must check at least one box");
-                            } else {
-                                getData("/acls/" + recipient).then(response => response.json())
-                                    .then(acl_datas => {
-                                        if (!!acl_datas && typeof acl_datas.readers !== "undefined" && acl_datas.readers !== null
-                                            && typeof acl_datas.writers !== "undefined" && acl_datas.writers !== null) {
-                                            data.readers = data.readers.concat(acl_datas.readers);
-                                            data.writers = data.writers.concat(acl_datas.writers);
+                                        if ($('#read').is(":checked")) {
+                                            data.readers = $('#drop').val();
                                         }
-                                        putData('/acls/' + recipient, data).then(respons => {
-                                            if (respons.status == 200) {
-                                                $('#acl_user')[0].reset();
-                                                data = {};
-                                                $('#drop').multiselect('refresh');
-                                                loadTable(recipient, userIdCreateEntry);
-                                                dropdown(recipient);
+                                        if ($('#write').is(":checked")) {
+                                            data.writers = $('#drop').val();
+                                            data.writers = data.writers.filter(item => item !== "public");
+                                        }
+                                        if (data.readers === null || data.readers.length === 0) {
+                                            alert("The user must have a read access!!");
+                                        } else {
+                                            if (data.writers.length === 0 && data.readers.length === 0) {
+                                                alert("You must check at least one box");
+                                            } else {
+                                                getData("/acls/" + recipient).then(response => response.json())
+                                                    .then(acl_datas => {
+                                                        if (!!acl_datas && typeof acl_datas.readers !== "undefined" && acl_datas.readers !== null
+                                                            && typeof acl_datas.writers !== "undefined" && acl_datas.writers !== null) {
+                                                            data.readers = data.readers.concat(acl_datas.readers);
+                                                            data.writers = data.writers.concat(acl_datas.writers);
+
+                                                        }
+                                                        putData('/acls/' + recipient, data).then(respons => {
+                                                            if (respons.status == 200) {
+                                                                $('#acl_user')[0].reset();
+                                                                data = {};
+                                                                $('#drop').multiselect('refresh');
+                                                                loadTable(recipient, userIdCreateEntry);
+                                                                dropdown(recipient);
+                                                            } else if (respons.status == 403) {
+                                                                alert("You do not have access to modify this entry");
+                                                                location.reload();
+                                                            }
+                                                        });
+
+                                                    });
                                             }
-                                        });
-
-                                    });
-                            }
-
-                        }
-
-                    });
-                    loadTable(recipient, userIdCreateEntry);
-                    dropdown(recipient);
-                });
-            } else {
-                data.results.forEach(element => {
-                    if (!!element.content) {
-                        tableElmt = element.content['@id'];
-                        var id = tableElmt.split("/");
-                        tableHTML += "<tr>"
-                        tableHTML += "<td scope='row'>" + element.content['@id'] + "</td>";
-                        tableHTML += (!!element.content['name']) ? "<td>" + element.content['name'] + "</td>" : "<td></td>";
-                        tableHTML += "<td>";
-                        tableHTML += (!!element['id']) ? "<div class='btn-group' role='group' aria-label='Basic radio toggle button group'><button type='button' class='btn btn-primary' onclick=OpenBtnPage('edit_" + element.content['@id'] + "_" + element['type'] + "_" + encodeURIComponent(urlValue[0]) + "')>"
-                            + "<i class='bi bi-pencil-square'></i></button>" : " ";
-                        tableHTML += (!!element['id']) ? "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#delete" + id[1] + "' >"
-                            + "<i class='bi bi-x-square'></i></button>"
-                            + "<div class='modal fade' id='delete" + id[1] + "' tabindex='-1' role='dialog' aria-labelledby='myModalLabel'>"
-                            + "<div class='modal-dialog modal-sm' role='document'>"
-                            + " <div class='modal-content'>"
-                            + "<div class='modal-body'>"
-                            + "Do you want to delete : <strong>" + element.content['name'] + "</strong> ?"
-                            + "</div>"
-                            + "<div class='modal-footer'>"
-                            + "<button type='button' class='btn btn-default' data-bs-dismiss='modal'>No</button>"
-                            + "<button type='button' class='btn btn-primary' onclick=OpenBtnPage('delete_" + element.content['@id'] + "_" + element['type'] + "_" + encodeURIComponent(urlValue[0]) + "')>Yes</button>"
-                            + "</div>"
-                            + "</div>"
-                            + "</div>"
-                            + "</div>"
-                            : " ";
-                        tableHTML += (!!element['id']) ? "<button type='button' class='btn btn-info' onclick=OpenBtnPage('view_" + element.content['@id'] + "_" + element['type'] + "_" + encodeURIComponent(urlValue[0]) + "')>"
-                            + "<i class='bi bi-eye'></i></button>" : " ";
-                        tableHTML += (!!element['id']) ? "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-id='" + element.content['@id'] + "_" + element.metadata["createdBy"] + "' data-bs-target='#shareModal'>"
-                            + "<i class='fas fa-share-alt'></i></button>"
-                            + "<div class='modal fade' id='shareModal' role='dialog'  tabindex='-1'  >"
-                            + "<div class='modal-dialog modal-lg' role='document'>"
-                            + " <div class='modal-content'>"
-                            + "  <div class='modal-header'>"
-                            + "<h4 class='modal-title' id='myModalLabel'>Share</h4>"
-                            + "<button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>"
-                            + "</div>"
-                            + "<div class='modal-body'>"
-                            + "<form id='acl_user'>"
-                            + "<div class='row g-3'>"
-                            + "<div class='col' id='select_drop'>"
-                            + "</div>"
-                            + "<div class='col form-check'> "
-                            + "<input type='checkbox' id='read' class='form-check-input' name='read' value='read' required>"
-                            + "<label for ='read' class='form-check-label'>Can Read</label> </div>"
-                            + "<div class='col form-check'> "
-                            + "<input type='checkbox' id='write' class='form-check-input'  name='write' value='write' required>"
-                            + "<label for='write' class='form-check-label'>Can write</label></div>"
-                            + "<button  type='submit' id='submit_btn' class='btn btn-primary col'>Add</button>"
-                            + "</div>"
-                            + "</form>"
-                            + "<hr>"
-                            + "<div id='table_user'></div>"
-                            + "</div>"
-                            + "</div>"
-                            + "</div>"
-                            + "</div></div>"
-                            : " ";
-                        tableHTML += "</td></tr>";
-                    }
-                });
-                document.getElementById("page-header").innerHTML = page_name;
-                tableHTML += "</tbody></table></div></div>";
-                if (!!tableElmt) {
-                    wrapperTable.innerHTML = tableHTML;
-                }
-                else {
-                    wrapperTable.innerHTML = "";
-                }
-                $('#table_id').DataTable();
-                $('#shareModal').on('hidden.bs.modal', function (e) {
-                    $('#acl_user')[0].reset();
-                    location.reload();
-                });
-                $('#shareModal').on('show.bs.modal', function (event) {
-
-                    var button = $(event.relatedTarget); // Button that triggered the modal
-                    var split_values = button.data('id'); // Extract info from data-* attributes   
-                    split_values = split_values.split("_");
-                    var recipient = split_values[0];
-
-                    var userIdCreateEntry = split_values[1];
-
-                    $('#submit_btn').click(function (e) {
-                        e.preventDefault();
-
-                        var data = {
-                            readers: [],
-                            writers: []
-                        };
-
-                        if ($('#read').is(":checked")) {
-                            data.readers = $('#drop').val();
-                        }
-                        if ($('#write').is(":checked")) {
-                            data.writers = $('#drop').val();
-                            data.writers = data.writers.filter(item => item !== "public");
-                        }
-                        if (data.readers === null || data.readers.length === 0) {
-                            alert("The user must have a read access!!");
-                        } else {
-                            if (data.writers.length === 0 && data.readers.length === 0) {
-                                alert("You must check at least one box");
-                            } else {
-                                getData("/acls/" + recipient).then(response => response.json())
-                                    .then(acl_datas => {
-                                        if (!!acl_datas && typeof acl_datas.readers !== "undefined" && acl_datas.readers !== null
-                                            && typeof acl_datas.writers !== "undefined" && acl_datas.writers !== null) {
-                                            data.readers = data.readers.concat(acl_datas.readers);
-                                            data.writers = data.writers.concat(acl_datas.writers);
 
                                         }
-                                        putData('/acls/' + recipient, data).then(respons => {
-                                            if (respons.status == 200) {
-                                                $('#acl_user')[0].reset();
-                                                data = {};
-                                                $('#drop').multiselect('refresh');
-                                                loadTable(recipient, userIdCreateEntry);
-                                                dropdown(recipient);
-                                            } else if (respons.status == 403) {
-                                                alert("You do not have access to modify this entry");
-                                                location.reload();
-                                            }
-                                        });
 
                                     });
+                                    loadTable(recipient, userIdCreateEntry);
+                                    dropdown(recipient);
+
+                                });
                             }
 
-                        }
-
-                    });
-                    loadTable(recipient, userIdCreateEntry);
-                    dropdown(recipient);
-
+                        });
                 });
-            }
-
-        });
     });
 }
 

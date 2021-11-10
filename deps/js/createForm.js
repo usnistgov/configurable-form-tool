@@ -5,7 +5,8 @@ function createForm(formname) {
     localStorage.setItem("message", "");
     var html = "";
     var FormCreate = document.getElementById("contentTab");
-    getData("/objects/?query=jsonform AND /alternateName:" + formname)
+    formname = formname.split("/");
+    getData("/objects/?query="+formname[1]+" AND /alternateName:" + formname[0])
     .then(response => response.json())
     .then(data => {
         var formatValues = { "enum": [], "titleMap": {} };
