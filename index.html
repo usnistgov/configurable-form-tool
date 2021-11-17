@@ -1,6 +1,5 @@
 <!doctype html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,28 +7,45 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="./deps/img/form-tool-logo-transparent.png">
-    <link rel="canonical" href="">
-
     <title>Laboratory Metadata Capture</title>
-
+        <!-- Favicons -->
+    <link rel="apple-touch-icon" href="./deps/img/form-tool-logo-transparent.png" sizes="180x180">
+    <link rel="icon" href="./deps/img/form-tool-logo-transparent.png" sizes="32x32" type="image/png">
+    <link rel="icon" href="./deps/img/form-tool-logo-transparent.png" sizes="16x16" type="image/png">
+    <link rel="canonical" href="">
+    <style>
+        .bd-placeholder-img {
+          font-size: 1.125rem;
+          text-anchor: middle;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          user-select: none;
+        }
+  
+        @media (min-width: 768px) {
+          .bd-placeholder-img-lg {
+            font-size: 3.5rem;
+          }
+        }
+      </style>
+    
     <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="./deps/opt/bootstrap.css">
-    <link rel="stylesheet" href="./deps/css/style.css">
+    <!--<link rel="stylesheet" href="./deps/opt/bootstrap.css"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="./deps/css/style_new.css">
 
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap.min.css">
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
-    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+  
     <!-- Our project just needs Font Awesome solid + brand -->
+    <script type="text/javascript" src="./config.js"></script>
     <script defer src="./node_modules/@fortawesome/fontawesome-free/js/brands.js"></script>
     <script defer src="./node_modules/@fortawesome/fontawesome-free/js/solid.js"></script>
     <script defer src="./node_modules/@fortawesome/fontawesome-free/js/fontawesome.js"></script>
 
-
-
-    <script type="text/javascript" src="./deps/js/clientutils.js"></script>
+    
+    <script type="text/javascript"  src="./deps/js/clientutils.js"></script>
     <script type="text/javascript" src="./deps/js/login_required.js"></script>
     <script type="text/javascript" src="./deps/js/login.js"></script>
 
@@ -40,88 +56,66 @@
 </head>
 
 <body onload="sidebarF('','')">
-
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
-                    aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="index.html">
-                    <img src="./deps/img/logo_form.png" height="46" alt="">
-                </a>
-
-
-
+    
+    <header class="navbar navbar-dark sticky-top bg-light flex-md-nowrap p-0 ">
+        <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="index.html">
+            <img src="./deps/img/logo_form.png"  style="height: 25px;" alt="">
+        </a>
+        <button class="navbar-toggler position-absolute d-md-none bg-secondary collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="w-100"></div>
+        <nav class="navbar navbar-expand-lg bg-light">
+            <div class="container-fluid">
+                <img class="me-3  avatar"  src="./deps/img/img_avatar.png" alt="Avatar">
+                <a class="me-3 text-decoration-none" style="color: black;" id="username"></a>
+                <a class="me-2 " href="#" onClick="logoutUser()">Logout</a>
             </div>
-            <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav navbar-right">
-                    <li>
-                        <img src="./deps/img/img_avatar.png" alt="Avatar" class="avatar">
-                    </li>
-                    <li> <a id="username"></a></li>
-                    <li> <a href="#" onClick="logoutUser()">Logout</a></li>
-
-
-                </ul>
-
-            </div>
-        </div>
-    </nav>
-
+          </nav>
+      </header>
     <div class="container-fluid">
         <div class="row">
-
-            <div class="col-sm-3 col-md-2 sidebar">
-                <h4>Filter Forms: <button style="font-size: 13px;" onclick="ResetFilter()"> Reset</button></h4>
-                <form>
-                    <div class="form-group" id="primary_select">
-                        <select class="form-control select_class">
-                            <option selected="selected">Primary Filter</option>
-                        </select>
-                    </div>
-                    <div class="form-group" id="secondary_select">
-                        <select class="form-control select_class">
-                            <option selected="selected">Secondary Filter</option>
-                        </select>
-                    </div>
-                </form>
-                <ul class="nav nav-sidebar" id="tab">
-                </ul>
-            </div>
-            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-
-                <div id="page-header"></div>
-                <!--<input type='text' class='form-control form-control-lg' id='search'>-->
-                <div class="alert alert-success alert-dismissible fade in" role="alert" id="msg" style="display: none;">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                            aria-hidden="true">×</span></button>
-                    <strong id="message"></strong>
-                </div>
-                <div id="contentTab">
-
+            <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+                <div class="position-sticky pt-3 ">
+                    <h4>Filter Forms: <button style="font-size: 13px;" class="btn-sm btn-primary" onclick="ResetFilter()"> Reset</button></h4>
+                    <form>
+                        <div class="input-group mb-3" id="primary_select">
+                            <select class="form-select"  >
+                                <option selected>Primary Filter</option>
+                            </select>
+                        </div>
+                        <div class="input-group mb-3" id="secondary_select">
+                            <select class="form-select" >
+                                <option selected>Secondary Filter</option>
+                            </select>
+                        </div>
+                    </form>
+                    <ul class="nav flex-column" id="tab">
+                    </ul>
                 </div>
                 
+            </nav>
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="alert alert-success alert-dismissible fade show" role="alert" id="msg" style="display: none;">
+                    <strong id="message"></strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <div id="page-header" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Home Page</h1>
+                </div>
+                <div id="contentTab"></div>
                 <div id="link"></div>
                 <div id="displayPlayload"></div>
-            </div>
-
+            </main>
         </div>
     </div>
-
-
 </body>
-<script src="https://getbootstrap.com/docs/3.4/dist/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/js/bootstrap-multiselect.js"></script>
 
-<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
-<script src="./deps/js/prettyprint.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<script src="./deps/js/bootstrap-multiselect.js"></script>
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
-
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.13/css/bootstrap-multiselect.css">
 <!--Script to create a sidebar  -->
 <script src="./deps/js/sidebar.js"></script>
 <!--Script to create tables that will display content -->
@@ -132,7 +126,6 @@
 <script src="./deps/js/edit_view.js"></script>
 <script>
     if (!!localStorage.getItem("message") && localStorage.getItem("message") != "") {
-
         document.getElementById('msg').style.display = 'block';
         document.getElementById("message").innerHTML = localStorage.getItem("message");
         localStorage.setItem("message", "");
@@ -148,16 +141,13 @@
         if (document.getElementById("secondary_key")) {
             document.getElementById("secondary_key").value = '';
         }
-
         localStorage.setItem("primary_filter", "");
         localStorage.setItem("secondary_filter", "");
         sidebarF('', '');
-
     }
     if (document.getElementById('jsonform-1-elt-dateModified')) {
         var today = new Date();
         document.querySelector('input[name="dateModified"]').value = today.toISOString().substr(0, 10);
-        //document.getElementById('jsonform-1-elt-dateModified').value =today.toISOString().substr(0, 10);
     }
 </script>
 
