@@ -1,6 +1,4 @@
 
-
-
 function secondaryFunction(first){
     var second = document.getElementById("secondary_key").value;
     localStorage.setItem("primary_filter", first);
@@ -9,8 +7,7 @@ function secondaryFunction(first){
 }
 
 function sidebarF(primaryV, secondary){
-    
-    var filter ="";
+   var filter ="";
    var primary_S =  localStorage.getItem("primary_filter");
    var secondary_S = localStorage.getItem("secondary_filter");
     if(primaryV){
@@ -36,26 +33,25 @@ getData("/objects/?query=type:Form"+filter)
     primary_select+="<option value=''selected='selected'>Primary Filter</option>";
     data.results.forEach(element => {
         if (!!element.content.cordraSchema ) {
-            if(!!element.content.filterPrimary){
-                element.content.filterPrimary.forEach(value=>{
+            if (!!element.content.filterPrimary) {
+                // id = @id, mode = list, 
+                element.content.filterPrimary.forEach(value => {
                     primary.add(value);
                 });
             } 
-            if(!!Array.isArray(element.content.category)){
-                element.content.category.forEach(elmt =>{
+            if (!!Array.isArray(element.content.category)) {
+                element.content.category.forEach(elmt => {
                     if(!obj[elmt]){
                         obj[elmt] = new Array();
                     }
-                    obj[elmt].push(element.content.name+"/"+element.content.alternateName+"/"+element.content.cordraSchema);
+                    obj[elmt].push(element.content.name+":"+element.content['@id']);
                 });
             }else{
                 if(!obj[element.content.category]){
                     obj[element.content.category] = new Array();
                 }
-                obj[element.content.category].push(element.content.name+"/"+element.content.alternateName+"/"+element.content.cordraSchema);
-            }    
-            
-            
+                obj[element.content.category].push(element.content.name+":"+element.content['@id']);
+            }       
         }
     });
     for (let item of primary.values()){
@@ -64,18 +60,16 @@ getData("/objects/?query=type:Form"+filter)
         }
         else{
             primary_select+="<option value='"+item+"'>"+item+"</option>";
-        }
-       
+        }  
     }
     primary_select+="</select>";
-
     var myHTML="";
     for (const prop in obj) { 
         myHTML += "<h5 class='sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted'>" +
             "<span>"+prop + "</span></h5><ul class='nav flex-column'>";
         obj[prop].forEach(elmt=>{
-            data=elmt.split("/");
-            myHTML+="<li class='nav-item'><a class='nav-link' href='#' onclick=openContentElmt('" + encodeURIComponent(elmt)+ "') >" + data[0] + "</a></li>";
+            data = elmt.split(":");
+            myHTML+="<li class='nav-item'><a class='nav-link' href='#' onclick=openContentElmt('" + encodeURIComponent(data[1])+ "') >" + data[0] + "</a></li>";
         });
             
         myHTML+="</ul>";
@@ -88,9 +82,7 @@ getData("/objects/?query=type:Form"+filter)
 
   
 function primaryFunction(){
-
     var x = document.getElementById("primary_key").value;
-    
     if(localStorage.getItem("primary_filter") !== x){
         localStorage.setItem("secondary_filter", "");
     }
@@ -102,7 +94,6 @@ function primaryFunction(){
         localStorage.setItem("secondary_filter", "");
     }
    // sidebarF(x,secondary_S);
-    
     var secondary = new Set();
     var secondary_select="";
     var secondaryWrapper = document.getElementById("secondary_select");
