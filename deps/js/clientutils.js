@@ -1,8 +1,5 @@
 /// Set of helper utilities to manage a Cordra client
 
-// TODO this belongs somewhere not here
- //const CORDRA_HTTPS_URL = 'https://localhost:8443'
-//const CORDRA_HTTPS_URL = main_url.CORDRA_HTTPS_URL;
 /// Check if a string is nonempty
 console.log(CORDRA_HTTPS_URL);
 function nonEmpty(str) {
