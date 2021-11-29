@@ -137,6 +137,10 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                                 + "</div>"
                                 + "</form>"
                                 + "<hr>"
+                                + "<div class='col form-check'>"
+                                + "<input type='checkbox' id='public' class='form-check-input' name='public' value='public' >"
+                                + "<label for ='public' class='form-check-label'>Public can read</label> </div>"
+                                + "<hr>"
                                 + "<div id='table_user'></div>"
                                 + "</div>"
                                 + "<div class='modal-footer'>"
@@ -177,7 +181,6 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                                                             element.content.schema[item.key].enum = selectValues;
                                                         }
                                                     });
-                                                    
                                                     $('form#' + element.content.alternateName).jsonForm({
                                                         "schema": element.content.schema,
                                                         "form": element.content.form,
@@ -219,22 +222,57 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                                 var recipient = split_values[0];
 
                                 var userIdCreateEntry = split_values[1];
+                                /*
+                                * public can read check box 
+                                */
+                                var checkbox_public = document.querySelector("input[name=public]");
 
-                                $('#submit_btn').click(function (e) {
-                                    e.preventDefault();
-
+                                checkbox_public.addEventListener('change', function() {
                                     var data = {
                                         readers: [],
                                         writers: []
                                     };
-
+                                  var flag =false;
+                                  if(this.checked){
+                                    data.readers=["public"];
+                                    flag = true;
+                                  }
+                                  getData("/acls/" + recipient).then(response => response.json())
+                                    .then(acl_datas => {
+                                        if (!!acl_datas && typeof acl_datas.readers !== "undefined") {
+                                            if(flag == true){
+                                                data.readers = data.readers.concat(acl_datas.readers);
+                                            }else{
+                                                data.readers = acl_datas.readers.filter(item => item !== "public");
+                                            }
+                                            data.writers = acl_datas.writers
+                                        }
+                                        putData('/acls/' + recipient, data).then(respons => {
+                                            if (respons.status == 200) {
+                                                $('#acl_user')[0].reset();
+                                                data = {};
+                                                $('#drop').multiselect('refresh');
+                                                loadTable(recipient, userIdCreateEntry);
+                                                dropdown(recipient);
+                                            }
+                                        });
+                                    });
+                                });
+                                /*
+                                * public can read check box 
+                                */
+                                $('#submit_btn').click(function (e) {
+                                    e.preventDefault();
+                                    var data = {
+                                        readers: [],
+                                        writers: []
+                                    };
                                     if ($('#read').is(":checked")) {
                                         data.readers = $('#drop').val();
                                     }
                                     if ($('#write').is(":checked")) {
                                         data.writers = $('#drop').val();
                                     }
-
                                     if (data.writers === null && data.readers === null) {
                                         alert("You must select a user");
                                     } else {
@@ -377,17 +415,18 @@ function modifiedForm(content, datas) {
                     body: data_form
                 }).then(r => {
                     if (r.status == 200) {
-                        alert("The form was submitted successfully.");
                         localStorage.setItem("message", "The form was modified  successfully.");
                         $('form#' + content.alternateName)[0].reset();
                         window.location.replace(localStorage.getItem("redirect"));
+                    }else if (r.status == 403) {
+                        alert("You do not have access to modify this entry");
+                        location.reload();
                     }
                 });
             } else {
                 putData('/objects/' + datas.results[0].content['@id'], values)
                     .then(response => {
                         if (response.status == 200) {
-                            alert("The form was submitted successfully.");
                             localStorage.setItem("message", "The form was modified  successfully.");
                             $('form#' + content.alternateName)[0].reset();
                             window.location.replace(localStorage.getItem("redirect"));
