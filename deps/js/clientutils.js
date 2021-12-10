@@ -1,7 +1,6 @@
 /// Set of helper utilities to manage a Cordra client
 
 /// Check if a string is nonempty
-console.log(CORDRA_HTTPS_URL);
 function nonEmpty(str) {
 	// TODO less hacky
 	return !!str;

@@ -129,6 +129,10 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                                                     + "</div>"
                                                     + "</form>"
                                                     + "<hr>"
+                                                    + "<div class='col form-check'>"
+                                                    + "<input type='checkbox' id='public' class='form-check-input' name='public' value='public' >"
+                                                    + "<label for ='public' class='form-check-label'>Public can read</label> </div>"
+                                                    + "<hr>"
                                                     + "<div id='table_user'></div>"
                                                     + "</div>"
                                                     + "</div>"
@@ -163,7 +167,45 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                                     var recipient = split_values[0];
 
                                     var userIdCreateEntry = split_values[1];
+                                     /*
+                                * public can read check box 
+                                */
+                                var checkbox_public = document.querySelector("input[name=public]");
 
+                                checkbox_public.addEventListener('change', function() {
+                                    var data = {
+                                        readers: [],
+                                        writers: []
+                                    };
+                                  var flag =false;
+                                  if(this.checked){
+                                    data.readers=["public"];
+                                    flag = true;
+                                  }
+                                  getData("/acls/" + recipient).then(response => response.json())
+                                    .then(acl_datas => {
+                                        if (!!acl_datas && typeof acl_datas.readers !== "undefined") {
+                                            if(flag == true){
+                                                data.readers = data.readers.concat(acl_datas.readers);
+                                            }else{
+                                                data.readers = acl_datas.readers.filter(item => item !== "public");
+                                            }
+                                            data.writers = acl_datas.writers
+                                        }
+                                        putData('/acls/' + recipient, data).then(respons => {
+                                            if (respons.status == 200) {
+                                                $('#acl_user')[0].reset();
+                                                data = {};
+                                                $('#drop').multiselect('refresh');
+                                                loadTable(recipient, userIdCreateEntry);
+                                                dropdown(recipient);
+                                            }
+                                        });
+                                    });
+                                });
+                                /*
+                                * public can read check box 
+                                */
                                     $('#submit_btn').click(function (e) {
                                         e.preventDefault();
 
@@ -264,6 +306,10 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                                             + "</div>"
                                             + "</form>"
                                             + "<hr>"
+                                            + "<div class='col form-check'>"
+                                            + "<input type='checkbox' id='public' class='form-check-input' name='public' value='public' >"
+                                            + "<label for ='public' class='form-check-label'>Public can read</label> </div>"
+                                            + "<hr>"
                                             + "<div id='table_user'></div>"
                                             + "</div>"
                                             + "</div>"
@@ -294,7 +340,45 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                                     var recipient = split_values[0];
 
                                     var userIdCreateEntry = split_values[1];
+                                    /*
+                                * public can read check box 
+                                */
+                                var checkbox_public = document.querySelector("input[name=public]");
 
+                                checkbox_public.addEventListener('change', function() {
+                                    var data = {
+                                        readers: [],
+                                        writers: []
+                                    };
+                                  var flag =false;
+                                  if(this.checked){
+                                    data.readers=["public"];
+                                    flag = true;
+                                  }
+                                  getData("/acls/" + recipient).then(response => response.json())
+                                    .then(acl_datas => {
+                                        if (!!acl_datas && typeof acl_datas.readers !== "undefined") {
+                                            if(flag == true){
+                                                data.readers = data.readers.concat(acl_datas.readers);
+                                            }else{
+                                                data.readers = acl_datas.readers.filter(item => item !== "public");
+                                            }
+                                            data.writers = acl_datas.writers
+                                        }
+                                        putData('/acls/' + recipient, data).then(respons => {
+                                            if (respons.status == 200) {
+                                                $('#acl_user')[0].reset();
+                                                data = {};
+                                                $('#drop').multiselect('refresh');
+                                                loadTable(recipient, userIdCreateEntry);
+                                                dropdown(recipient);
+                                            }
+                                        });
+                                    });
+                                });
+                                /*
+                                * public can read check box 
+                                */
                                     $('#submit_btn').click(function (e) {
                                         e.preventDefault();
 
@@ -370,27 +454,38 @@ function loadTable(recipient, idUser) {
             if (!!acl_datas && typeof acl_datas.readers !== "undefined" && acl_datas.readers !== null
                 && typeof acl_datas.writers !== "undefined" && acl_datas.writers !== null) {
                 tableUsers += " <div class='table-responsive' ><table  id='tableUser'  class='table table-striped table-bordered table-hover'>";
-                tableUsers += "<thead><tr><th scope='col'>Persistent Identifier</th><th scope='col'>Can Read?</th><th>Can Write?</th><th></th></thead>";
-
+                tableUsers += "<thead><tr><th scope='col'>Persistent Identifier</th><th scope='col'>Can Read?</th><th>Can Write?</th><th></th></tr></thead>";
+                var flag = false;
                 acl_datas.readers.forEach(elt => {
-                    if (!!elt && elt.length > 0 && elt !== "public")
+                    if (!!elt && elt.length > 0 && elt !== "public"){
                         setUsers.set(elt, { readers: true, writers: false });
+                    }else if(!!elt && elt.length > 0 && elt === "public"){
+                        document.getElementById("public").checked = true;
+                        flag = true;
+                    }
+                        
                 });
+                
                 acl_datas.writers.forEach(elt_2 => {
-                    if (!!elt_2 && elt_2.length > 0 && elt_2 !== "public")
+                    if (!!elt_2 && elt_2.length > 0 && elt_2 !== "public"){
                         if (!!setUsers.get(elt_2)) {
                             setUsers.set(elt_2, { ...setUsers.get(elt_2), writers: true });
                         } else {
                             setUsers.set(elt_2, { writers: true, readers: false });
                         }
+                    }
+                        
                 });
                 data.results.forEach(element => {
                     if (setUsers.has(element.content['@id'])) {
                         setUsers.set(element.content['@id'], { ...setUsers.get(element.content['@id']), name: element.content['name'] });
                     }
                 });
+                tableUsers += "<tbody>";
+                if(flag === true){
+                    tableUsers += "<tr><td> Public</td><td> Yes </td><td > No</td><td></td></tr>";
+                }
                 for (const [key, value] of setUsers.entries()) {
-                    if (key !== idUser) {
                         tableUsers += (!!value.name && typeof value.name !== "undefined") ? "<td>" + value.name + "</td>" : "<td> </td>";
                         tableUsers += (typeof value.readers !== "undefined") ? ((value.readers == true) ? "<td> <div class='form-switch'><input type='checkbox' name='readers[]' role='switch' class='form-check-input'    onchange=switch_btn('readers_" + key + "_" + recipient + "_" + value.readers + "_" + idUser + "') checked></div></td>" : "<td> <div class='form-switch'><input type='checkbox' name='readers[]' role='switch'  class='form-check-input'   onchange=switch_btn('readers_" + key + "_" + recipient + "_" + value.readers + "_" + idUser + "')></div></td>") : "<td> </td>";
                         tableUsers += (typeof value.writers !== "undefined") ? ((value.writers == true) ? "<td> <div class='form-switch'><input type='checkbox' name='writers[]' role='switch' class='form-check-input'    onchange=switch_btn('writers_" + key + "_" + recipient + "_" + value.writers + "_" + idUser + "') checked></div></td>" : "<td><div class='form-switch'> <input type='checkbox' name='writers[]' role='switch'  class='form-check-input'    onchange=switch_btn('writers_" + key + "_" + recipient + "_" + value.writers + "_" + idUser + "')></div></td>") : "<td> </td>";
@@ -399,9 +494,8 @@ function loadTable(recipient, idUser) {
                             + "<i class='bi bi-x-square'></i></button>"
                             : " ";
                         tableUsers += "</td></tr>";
-                    }
                 }
-                tableUsers += "</table></div>";
+                tableUsers += "</tbody></table></div>";
                 table_user.innerHTML = tableUsers;
                 $('#tableUser').DataTable();
             }
@@ -504,9 +598,6 @@ function dropdown(recipient) {
                         });
                     }
                     selectDrop += '<select id="drop" name="users[]"  multiple="multiple" class="form-select-lg" style="display: none;"  required>';
-                    if (!setUsers.has("public")) {
-                        selectDrop += '<option value="public">Public</option>';
-                    }
                     data.results.forEach(element => {
                         if (!setUsers.has(element.content['@id']))
                             selectDrop += '<option value="' + element.content['@id'] + '">' + element.content['name'] + '</option>';

@@ -15,6 +15,5 @@ if (null !== authdata) {
 	//console.log(  intro_ret);
 } else {
 	// FORCE LOGIN HERE
-	alert("Please log in to use this page!");
 	window.location.replace("login/index.html");
 }
