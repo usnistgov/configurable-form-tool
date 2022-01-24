@@ -220,6 +220,46 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
 
                                 var userIdCreateEntry = split_values[1];
 
+<<<<<<< Updated upstream
+=======
+                                checkbox_public.addEventListener('change', function() {
+                                    var data = {
+                                        readers: [],
+                                        writers: []
+                                    };
+                                  var flag =false;
+                                  if(this.checked){
+                                    data.readers=["public"];
+                                    flag = true;
+                                  }
+                                  getData("/acls/" + recipient).then(response => response.json())
+                                    .then(acl_datas => {
+                                        if (!!acl_datas && typeof acl_datas.readers !== "undefined") {
+                                            if(flag == true){
+                                                data.readers = data.readers.concat(acl_datas.readers);
+                                            }else{
+                                                data.readers = acl_datas.readers.filter(item => item !== "public");
+                                            }
+                                            data.writers = acl_datas.writers
+                                        }
+                                        putData('/acls/' + recipient, data).then(respons => {
+                                            if (respons.status == 200) {
+                                                $('#acl_user')[0].reset();
+                                                data = {};
+                                                $('#drop').multiselect('refresh');
+                                                loadTable(recipient, userIdCreateEntry);
+                                                dropdown(recipient);
+                                            }else if (respons.status == 403) {
+                                                alert("You do not have access to modify this entry");
+                                                location.reload();
+                                            }
+                                        });
+                                    });
+                                });
+                                /*
+                                * public can read check box 
+                                */
+>>>>>>> Stashed changes
                                 $('#submit_btn').click(function (e) {
                                     e.preventDefault();
 
@@ -255,6 +295,9 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                                                             $('#drop').multiselect('refresh');
                                                             loadTable(recipient, userIdCreateEntry);
                                                             dropdown(recipient);
+                                                        }else if (respons.status == 403) {
+                                                            alert("You do not have access to modify this entry");
+                                                            location.reload();
                                                         }
                                                     });
                                                 });
@@ -275,6 +318,9 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                                         localStorage.setItem("message", "The entry was deleted successfully.");
                                         window.location.replace(localStorage.getItem("redirect"));
 
+                                    }else if (response.status == 403) {
+                                        alert("You do not have access to modify this entry");
+                                        location.reload();
                                     }
                                 });
                         }
@@ -391,6 +437,9 @@ function modifiedForm(content, datas) {
                             localStorage.setItem("message", "The form was modified  successfully.");
                             $('form#' + content.alternateName)[0].reset();
                             window.location.replace(localStorage.getItem("redirect"));
+                        }else if (response.status == 403) {
+                            alert("You do not have access to modify this entry");
+                            location.reload();
                         }
                     });
             }
