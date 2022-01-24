@@ -21,8 +21,33 @@ function openContentElmt(content) {
     }
 }
 
+
+
+
 if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !== null && GetURLParameter('mode') ==="list" &&
-    typeof GetURLParameter('form') !== "undefined" && GetURLParameter('form') !== null ) {
+    typeof GetURLParameter('form') !== "undefined" && GetURLParameter('form') !== null) {
+    
+    /**
+     * Server side database
+     */
+    var wrapperTab = document.getElementById("datatableServer");
+  
+     var tabHTML = "<table id='table_server' class='table table-striped table-bordered table-hover'>"
+     +"<thead>"
+         +"<tr>"
+            +" <th>First name</th>"
+            +" <th>Last name</th>"
+            +" <th>Position</th>"
+            +" <th>Office</th>"
+            +" <th>Start date</th>"
+            +" <th>Salary</th>"
+        +" </tr>"
+    +" </thead>"
+        + "</table>";
+        wrapperTab.innerHTML = tabHTML;
+    /**
+     * Server side database
+     */
 
     var wrapperTable = document.getElementById("contentTab");
     var page_name = "";
@@ -150,7 +175,12 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                                 else {
                                     wrapperTable.innerHTML = "";
                                 }
-                                $('#table_id').DataTable();
+                                $('#table_id').DataTable({
+                                    dom: 'Bfrtip',
+                                    buttons: [
+                                        'copy', 'csv', 'excel', 'pdf', 'print'
+                                    ]
+                                });
                                 $('#shareModal').on('hidden.bs.modal', function (e) {
                                     $('#acl_user')[0].reset();
                                     location.reload();
@@ -329,7 +359,12 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                                 else {
                                     wrapperTable.innerHTML = "";
                                 }
-                                $('#table_id').DataTable();
+                                $('#table_id').DataTable({
+                                    dom: 'Bfrtip',
+                                    buttons: [
+                                        'copy', 'csv', 'excel', 'pdf', 'print'
+                                    ]
+                                });
                                 $('#shareModal').on('hidden.bs.modal', function (e) {
                                     $('#acl_user')[0].reset();
                                     location.reload();
@@ -447,6 +482,16 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
     });
 }
 
+/*$(document).ready(function() {
+    $('#table_server').DataTable( {
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: 'https://sandbox.materialhub.org/objects/?query=type:%22Form%22',
+            type: 'GET'
+        }
+    } );
+} );*/
 function loadTable(recipient, idUser) {
     const table_user = document.getElementById('table_user');
     var tableUsers = "";
@@ -496,7 +541,12 @@ function loadTable(recipient, idUser) {
                 }
                 tableUsers += "</table></div>";
                 table_user.innerHTML = tableUsers;
-                $('#tableUser').DataTable();
+                $('#tableUser').DataTable({
+                    dom: 'Bfrtip',
+                    buttons: [
+                        'copy', 'csv', 'excel', 'pdf', 'print'
+                    ]
+                });
             }
         });
     });
