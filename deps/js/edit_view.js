@@ -220,8 +220,6 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
 
                                 var userIdCreateEntry = split_values[1];
 
-<<<<<<< Updated upstream
-=======
                                 checkbox_public.addEventListener('change', function() {
                                     var data = {
                                         readers: [],
@@ -259,7 +257,6 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                                 /*
                                 * public can read check box 
                                 */
->>>>>>> Stashed changes
                                 $('#submit_btn').click(function (e) {
                                     e.preventDefault();
 
@@ -423,7 +420,7 @@ function modifiedForm(content, datas) {
                     body: data_form
                 }).then(r => {
                     if (r.status == 200) {
-                        alert("The form was submitted successfully.");
+                       // alert("The form was submitted successfully.");
                         localStorage.setItem("message", "The form was modified  successfully.");
                         $('form#' + content.alternateName)[0].reset();
                         window.location.replace(localStorage.getItem("redirect"));
@@ -433,7 +430,7 @@ function modifiedForm(content, datas) {
                 putData('/objects/' + datas.results[0].content['@id'], values)
                     .then(response => {
                         if (response.status == 200) {
-                            alert("The form was submitted successfully.");
+                            //alert("The form was submitted successfully.");
                             localStorage.setItem("message", "The form was modified  successfully.");
                             $('form#' + content.alternateName)[0].reset();
                             window.location.replace(localStorage.getItem("redirect"));

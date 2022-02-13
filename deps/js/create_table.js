@@ -176,10 +176,25 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                                     wrapperTable.innerHTML = "";
                                 }
                                 $('#table_id').DataTable({
+                                    rowReorder: {
+                                        selector: 'td:nth-child(2)'
+                                    },
+                                    responsive: true,
                                     dom: 'Bfrtip',
                                     buttons: [
-                                        'copy', 'csv', 'excel', 'pdf', 'print'
-                                    ]
+                                        'copy', 'csv', 'excel', 'pdf', 'print','colvis',
+                                        {
+                                            extend: 'print',
+                                            text: 'Print ( just selected)',
+                                            exportOptions: {
+                                                columns: ':visible',
+                                                modifier: {
+                                                    selected: null
+                                                }
+                                            }
+                                        }
+                                    ], 
+                                    select: true
                                 });
                                 $('#shareModal').on('hidden.bs.modal', function (e) {
                                     $('#acl_user')[0].reset();
@@ -193,12 +208,10 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                                     var recipient = split_values[0];
 
                                     var userIdCreateEntry = split_values[1];
-<<<<<<< Updated upstream
 
-=======
                                      /*
                                 * public can read check box 
-                                */
+                                
                                 var checkbox_public = document.querySelector("input[name=public]");
 
                                 checkbox_public.addEventListener('change', function() {
@@ -238,7 +251,6 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                                 /*
                                 * public can read check box 
                                 */
->>>>>>> Stashed changes
                                     $('#submit_btn').click(function (e) {
                                         e.preventDefault();
 
@@ -360,10 +372,25 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                                     wrapperTable.innerHTML = "";
                                 }
                                 $('#table_id').DataTable({
+                                    rowReorder: {
+                                        selector: 'td:nth-child(2)'
+                                    },
+                                    responsive: true,
                                     dom: 'Bfrtip',
                                     buttons: [
-                                        'copy', 'csv', 'excel', 'pdf', 'print'
-                                    ]
+                                        'copy', 'csv', 'excel', 'pdf', 'print','colvis',
+                                        {
+                                            extend: 'print',
+                                            text: 'Print all (not just selected)',
+                                            exportOptions: {
+                                                columns: ':visible',
+                                                modifier: {
+                                                    selected: null
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    select: true
                                 });
                                 $('#shareModal').on('hidden.bs.modal', function (e) {
                                     $('#acl_user')[0].reset();
@@ -377,12 +404,10 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                                     var recipient = split_values[0];
 
                                     var userIdCreateEntry = split_values[1];
-<<<<<<< Updated upstream
 
-=======
                                     /*
                                 * public can read check box 
-                                */
+                                
                                 var checkbox_public = document.querySelector("input[name=public]");
 
                                 checkbox_public.addEventListener('change', function() {
@@ -422,7 +447,6 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                                 /*
                                 * public can read check box 
                                 */
->>>>>>> Stashed changes
                                     $('#submit_btn').click(function (e) {
                                         e.preventDefault();
 
@@ -542,10 +566,25 @@ function loadTable(recipient, idUser) {
                 tableUsers += "</table></div>";
                 table_user.innerHTML = tableUsers;
                 $('#tableUser').DataTable({
+                    rowReorder: {
+                        selector: 'td:nth-child(2)'
+                    },
+                    responsive: true,
                     dom: 'Bfrtip',
                     buttons: [
-                        'copy', 'csv', 'excel', 'pdf', 'print'
-                    ]
+                        'copy', 'csv', 'excel', 'pdf', 'print','colvis',
+                        {
+                            extend: 'print',
+                            text: 'Print all (not just selected)',
+                            exportOptions: {
+                                columns: ':visible',
+                                modifier: {
+                                    selected: null
+                                }
+                            }
+                        }
+                    ],            
+                    select: true
                 });
             }
         });

@@ -103,7 +103,7 @@ function createFormJson(content) {
                             if (response.status == 200) {
                                 document.getElementById("msg").style.display = "block";
                                 $("#msg").hide(1000);
-                                alert("The form was submitted successfully.");
+                               // alert("The form was submitted successfully.");
                                 $('form#' + content.alternateName)[0].reset();
                                 localStorage.setItem("message", "The form was submitted successfully.");
                                 window.location.replace(localStorage.getItem("redirect"));
@@ -124,7 +124,7 @@ function createFormJson(content) {
                                 if (response.status == 200) {
                                     document.getElementById("msg").style.display = "block";
                                     $("#msg").hide(1000);
-                                    alert("The form was submitted successfully.");
+                                  //  alert("The form was submitted successfully.");
                                     $('form#' + content.alternateName)[0].reset();
                                     localStorage.setItem("message", "The form was submitted successfully.");
                                     window.location.replace(localStorage.getItem("redirect"));
