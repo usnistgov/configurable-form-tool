@@ -26,29 +26,6 @@ function openContentElmt(content) {
 
 if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !== null && GetURLParameter('mode') ==="list" &&
     typeof GetURLParameter('form') !== "undefined" && GetURLParameter('form') !== null) {
-    
-    /**
-     * Server side database
-     */
-    var wrapperTab = document.getElementById("datatableServer");
-  
-     var tabHTML = "<table id='table_server' class='table table-striped table-bordered table-hover'>"
-     +"<thead>"
-         +"<tr>"
-            +" <th>First name</th>"
-            +" <th>Last name</th>"
-            +" <th>Position</th>"
-            +" <th>Office</th>"
-            +" <th>Start date</th>"
-            +" <th>Salary</th>"
-        +" </tr>"
-    +" </thead>"
-        + "</table>";
-        wrapperTab.innerHTML = tabHTML;
-    /**
-     * Server side database
-     */
-
     var wrapperTable = document.getElementById("contentTab");
     var page_name = "";
     var id_form = decodeURIComponent(GetURLParameter('form'));
@@ -154,6 +131,10 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                                                     + "</div>"
                                                     + "</form>"
                                                     + "<hr>"
+                                                    + "<div class='col form-check'>"
+                                                    + "<input type='checkbox' id='public' class='form-check-input' name='public' value='public' >"
+                                                    + "<label for ='public' class='form-check-label'>Public can read</label> </div>"
+                                                    + "<hr>"
                                                     + "<div id='table_user'></div>"
                                                     + "</div>"
                                                     + "</div>"
@@ -211,7 +192,7 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
 
                                      /*
                                 * public can read check box 
-                                
+                                */
                                 var checkbox_public = document.querySelector("input[name=public]");
 
                                 checkbox_public.addEventListener('change', function() {
@@ -354,6 +335,10 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                                             + "</div>"
                                             + "</form>"
                                             + "<hr>"
+                                            + "<div class='col form-check'>"
+                                            + "<input type='checkbox' id='public' class='form-check-input' name='public' value='public' >"
+                                            + "<label for ='public' class='form-check-label'>Public can read</label> </div>"
+                                            + "<hr>"
                                             + "<div id='table_user'></div>"
                                             + "</div>"
                                             + "</div>"
@@ -407,7 +392,7 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
 
                                     /*
                                 * public can read check box 
-                                
+                                */
                                 var checkbox_public = document.querySelector("input[name=public]");
 
                                 checkbox_public.addEventListener('change', function() {
@@ -534,9 +519,15 @@ function loadTable(recipient, idUser) {
                 tableUsers += " <div class='table-responsive' ><table  id='tableUser'  class='table table-striped table-bordered table-hover'>";
                 tableUsers += "<thead><tr><th scope='col'>Persistent Identifier</th><th scope='col'>Can Read?</th><th>Can Write?</th><th></th></thead>";
 
+                var flag = false;
                 acl_datas.readers.forEach(elt => {
-                    if (!!elt && elt.length > 0 && elt !== "public")
+                    if (!!elt && elt.length > 0 && elt !== "public"){
                         setUsers.set(elt, { readers: true, writers: false });
+                    }else if(!!elt && elt.length > 0 && elt === "public"){
+                        document.getElementById("public").checked = true;
+                        flag = true;
+                    }
+                        
                 });
                 acl_datas.writers.forEach(elt_2 => {
                     if (!!elt_2 && elt_2.length > 0 && elt_2 !== "public")
@@ -551,6 +542,10 @@ function loadTable(recipient, idUser) {
                         setUsers.set(element.content['@id'], { ...setUsers.get(element.content['@id']), name: element.content['name'] });
                     }
                 });
+                tableUsers += "<tbody>";
+                if(flag === true){
+                    tableUsers += "<tr><td> Public</td><td> Yes </td><td > No</td><td></td></tr>";
+                }
                 for (const [key, value] of setUsers.entries()) {
                     if (key !== idUser) {
                         tableUsers += (!!value.name && typeof value.name !== "undefined") ? "<td>" + value.name + "</td>" : "<td> </td>";
@@ -689,9 +684,6 @@ function dropdown(recipient) {
                         });
                     }
                     selectDrop += '<select id="drop" name="users[]"  multiple="multiple" class="form-select-lg" style="display: none;"  required>';
-                    if (!setUsers.has("public")) {
-                        selectDrop += '<option value="public">Public</option>';
-                    }
                     data.results.forEach(element => {
                         if (!setUsers.has(element.content['@id']))
                             selectDrop += '<option value="' + element.content['@id'] + '">' + element.content['name'] + '</option>';
