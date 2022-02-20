@@ -83,6 +83,7 @@ getData("/objects/?query=type:Form"+filter)
   
 function primaryFunction(){
     var x = document.getElementById("primary_key").value;
+   
     if(localStorage.getItem("primary_filter") !== x){
         localStorage.setItem("secondary_filter", "");
     }

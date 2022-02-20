@@ -254,6 +254,9 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                                                 $('#drop').multiselect('refresh');
                                                 loadTable(recipient, userIdCreateEntry);
                                                 dropdown(recipient);
+                                            }else if (respons.status == 403) {
+                                                alert("You do not have access to modify this entry");
+                                                location.reload();
                                             }
                                         });
                                     });
@@ -293,6 +296,9 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                                                             $('#drop').multiselect('refresh');
                                                             loadTable(recipient, userIdCreateEntry);
                                                             dropdown(recipient);
+                                                        }else if (respons.status == 403) {
+                                                            alert("You do not have access to modify this entry");
+                                                            location.reload();
                                                         }
                                                     });
                                                 });
@@ -313,6 +319,9 @@ if (typeof GetURLParameter('id') !== "undefined" && GetURLParameter('id') !== nu
                                         localStorage.setItem("message", "The entry was deleted successfully.");
                                         window.location.replace(localStorage.getItem("redirect"));
 
+                                    }else if (response.status == 403) {
+                                        alert("You do not have access to modify this entry");
+                                        location.reload();
                                     }
                                 });
                         }
@@ -415,6 +424,7 @@ function modifiedForm(content, datas) {
                     body: data_form
                 }).then(r => {
                     if (r.status == 200) {
+                       // alert("The form was submitted successfully.");
                         localStorage.setItem("message", "The form was modified  successfully.");
                         $('form#' + content.alternateName)[0].reset();
                         window.location.replace(localStorage.getItem("redirect"));
@@ -427,9 +437,13 @@ function modifiedForm(content, datas) {
                 putData('/objects/' + datas.results[0].content['@id'], values)
                     .then(response => {
                         if (response.status == 200) {
+                            //alert("The form was submitted successfully.");
                             localStorage.setItem("message", "The form was modified  successfully.");
                             $('form#' + content.alternateName)[0].reset();
                             window.location.replace(localStorage.getItem("redirect"));
+                        }else if (response.status == 403) {
+                            alert("You do not have access to modify this entry");
+                            location.reload();
                         }
                     });
             }

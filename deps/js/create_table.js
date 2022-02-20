@@ -21,9 +21,11 @@ function openContentElmt(content) {
     }
 }
 
-if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !== null && GetURLParameter('mode') ==="list" &&
-    typeof GetURLParameter('form') !== "undefined" && GetURLParameter('form') !== null ) {
 
+
+
+if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !== null && GetURLParameter('mode') ==="list" &&
+    typeof GetURLParameter('form') !== "undefined" && GetURLParameter('form') !== null) {
     var wrapperTable = document.getElementById("contentTab");
     var page_name = "";
     var id_form = decodeURIComponent(GetURLParameter('form'));
@@ -154,7 +156,27 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                                 else {
                                     wrapperTable.innerHTML = "";
                                 }
-                                $('#table_id').DataTable();
+                                $('#table_id').DataTable({
+                                    rowReorder: {
+                                        selector: 'td:nth-child(2)'
+                                    },
+                                    responsive: true,
+                                    dom: 'Bfrtip',
+                                    buttons: [
+                                        'copy', 'csv', 'excel', 'pdf', 'print','colvis',
+                                        {
+                                            extend: 'print',
+                                            text: 'Print ( just selected)',
+                                            exportOptions: {
+                                                columns: ':visible',
+                                                modifier: {
+                                                    selected: null
+                                                }
+                                            }
+                                        }
+                                    ], 
+                                    select: true
+                                });
                                 $('#shareModal').on('hidden.bs.modal', function (e) {
                                     $('#acl_user')[0].reset();
                                     location.reload();
@@ -199,6 +221,9 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                                                 $('#drop').multiselect('refresh');
                                                 loadTable(recipient, userIdCreateEntry);
                                                 dropdown(recipient);
+                                            }else if (respons.status == 403) {
+                                                alert("You do not have access to modify this entry");
+                                                location.reload();
                                             }
                                         });
                                     });
@@ -241,6 +266,9 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                                                                 $('#drop').multiselect('refresh');
                                                                 loadTable(recipient, userIdCreateEntry);
                                                                 dropdown(recipient);
+                                                            }else if (respons.status == 403) {
+                                                                alert("You do not have access to modify this entry");
+                                                                location.reload();
                                                             }
                                                         });
 
@@ -327,7 +355,27 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                                 else {
                                     wrapperTable.innerHTML = "";
                                 }
-                                $('#table_id').DataTable();
+                                $('#table_id').DataTable({
+                                    rowReorder: {
+                                        selector: 'td:nth-child(2)'
+                                    },
+                                    responsive: true,
+                                    dom: 'Bfrtip',
+                                    buttons: [
+                                        'copy', 'csv', 'excel', 'pdf', 'print','colvis',
+                                        {
+                                            extend: 'print',
+                                            text: 'Print all (not just selected)',
+                                            exportOptions: {
+                                                columns: ':visible',
+                                                modifier: {
+                                                    selected: null
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    select: true
+                                });
                                 $('#shareModal').on('hidden.bs.modal', function (e) {
                                     $('#acl_user')[0].reset();
                                     location.reload();
@@ -372,6 +420,9 @@ if (typeof GetURLParameter('mode') !== "undefined" && GetURLParameter('mode') !=
                                                 $('#drop').multiselect('refresh');
                                                 loadTable(recipient, userIdCreateEntry);
                                                 dropdown(recipient);
+                                            }else if (respons.status == 403) {
+                                                alert("You do not have access to modify this entry");
+                                                location.reload();
                                             }
                                         });
                                     });
@@ -454,7 +505,8 @@ function loadTable(recipient, idUser) {
             if (!!acl_datas && typeof acl_datas.readers !== "undefined" && acl_datas.readers !== null
                 && typeof acl_datas.writers !== "undefined" && acl_datas.writers !== null) {
                 tableUsers += " <div class='table-responsive' ><table  id='tableUser'  class='table table-striped table-bordered table-hover'>";
-                tableUsers += "<thead><tr><th scope='col'>Persistent Identifier</th><th scope='col'>Can Read?</th><th>Can Write?</th><th></th></tr></thead>";
+                tableUsers += "<thead><tr><th scope='col'>Persistent Identifier</th><th scope='col'>Can Read?</th><th>Can Write?</th><th></th></thead>";
+
                 var flag = false;
                 acl_datas.readers.forEach(elt => {
                     if (!!elt && elt.length > 0 && elt !== "public"){
@@ -497,7 +549,27 @@ function loadTable(recipient, idUser) {
                 }
                 tableUsers += "</tbody></table></div>";
                 table_user.innerHTML = tableUsers;
-                $('#tableUser').DataTable();
+                $('#tableUser').DataTable({
+                    rowReorder: {
+                        selector: 'td:nth-child(2)'
+                    },
+                    responsive: true,
+                    dom: 'Bfrtip',
+                    buttons: [
+                        'copy', 'csv', 'excel', 'pdf', 'print','colvis',
+                        {
+                            extend: 'print',
+                            text: 'Print all (not just selected)',
+                            exportOptions: {
+                                columns: ':visible',
+                                modifier: {
+                                    selected: null
+                                }
+                            }
+                        }
+                    ],            
+                    select: true
+                });
             }
         });
     });
@@ -572,6 +644,9 @@ function removeUser(name) {
                     $('#drop').multiselect('refresh');
                     loadTable(name.split("_")[2], name.split("_")[3]);
                     dropdown(name.split("_")[2]);
+                }else if (respons.status == 403) {
+                    alert("You do not have access to modify this entry");
+                    location.reload();
                 }
             });
         });
