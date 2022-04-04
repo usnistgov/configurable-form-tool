@@ -1,1 +1,1 @@
-let CORDRA_HTTPS_URL = "https://sandbox.materialhub.org";
+let CORDRA_HTTPS_URL = "https://localhost";
