@@ -101,3 +101,23 @@ body {
     border-radius: 50%;
  } 
  
+ .jsonform-required > label::after {
+           
+  content:" *";
+  color: red;
+}
+.jsonform-hasrequired::after{
+  content: '* Required field';
+  display: block;
+  color: red;
+  padding-top: 1em;
+}
+
+
+.expandable > legend:before {
+  content: '\25B8';
+  padding-right: 5px;
+}
+.expanded > legend:before {
+  content: '\25BE';
+}
